@@ -1,18 +1,21 @@
 {
-  "name": "cube-explorer-shared",
+  "name": "@cube-explorer/shared",
   "version": "1.0.0",
-  "description": "Code partagé entre frontend et backend",
+  "description": "Shared types and utilities for CubeExplorer",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "dev": "tsc --watch"
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist"
   },
-  "keywords": ["rubik", "cube", "shared"],
+  "keywords": ["rubik", "cube", "shared", "types"],
   "author": "Mickael",
   "license": "MIT",
   "devDependencies": {
-    "typescript": "^5.3.3",
-    "@types/node": "^20.10.5"
-  }
+    "typescript": "^5.3.3"
+  },
+  "files": [
+    "dist"
+  ]
 }

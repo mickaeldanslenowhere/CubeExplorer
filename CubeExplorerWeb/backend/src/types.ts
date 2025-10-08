@@ -1,5 +1,4 @@
-// Shared types between frontend and backend
-
+// Types for the backend
 export interface CubeState {
   id: string;
   faces: {
