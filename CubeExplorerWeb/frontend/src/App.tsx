@@ -244,6 +244,199 @@ function App() {
         newState.up[2] = originalRight[2];
         break;
       }
+        
+      // Inverse moves (counter-clockwise)
+      case 'R\'': {
+        // R' move: rotate right face counter-clockwise (inverse of R)
+        newState.right = [newState.right[2], newState.right[5], newState.right[8], newState.right[1], newState.right[4], newState.right[7], newState.right[0], newState.right[3], newState.right[6]];
+        
+        // Save original values before modification
+        const originalUp = [...newState.up];
+        const originalFront = [...newState.front];
+        const originalDown = [...newState.down];
+        const originalBack = [...newState.back];
+        
+        // R' move: up right column -> front right column
+        newState.front[2] = originalUp[2];
+        newState.front[5] = originalUp[5];
+        newState.front[8] = originalUp[8];
+        
+        // front right column -> down right column
+        newState.down[2] = originalFront[2];
+        newState.down[5] = originalFront[5];
+        newState.down[8] = originalFront[8];
+        
+        // down right column -> back left column (reversed)
+        newState.back[0] = originalDown[8];
+        newState.back[3] = originalDown[5];
+        newState.back[6] = originalDown[2];
+        
+        // back left column -> up right column (reversed)
+        newState.up[2] = originalBack[6];
+        newState.up[5] = originalBack[3];
+        newState.up[8] = originalBack[0];
+        break;
+      }
+        
+      case 'U\'': {
+        // U' move: rotate up face counter-clockwise (inverse of U)
+        newState.up = [newState.up[2], newState.up[5], newState.up[8], newState.up[1], newState.up[4], newState.up[7], newState.up[0], newState.up[3], newState.up[6]];
+        
+        // Save original values before modification
+        const originalFront = [...newState.front];
+        const originalRight = [...newState.right];
+        const originalBack = [...newState.back];
+        const originalLeft = [...newState.left];
+        
+        // U' move: front top row -> right top row
+        newState.right[0] = originalFront[0];
+        newState.right[1] = originalFront[1];
+        newState.right[2] = originalFront[2];
+        
+        // right top row -> back top row
+        newState.back[0] = originalRight[0];
+        newState.back[1] = originalRight[1];
+        newState.back[2] = originalRight[2];
+        
+        // back top row -> left top row
+        newState.left[0] = originalBack[0];
+        newState.left[1] = originalBack[1];
+        newState.left[2] = originalBack[2];
+        
+        // left top row -> front top row
+        newState.front[0] = originalLeft[0];
+        newState.front[1] = originalLeft[1];
+        newState.front[2] = originalLeft[2];
+        break;
+      }
+        
+      case 'F\'': {
+        // F' move: rotate front face counter-clockwise (inverse of F)
+        newState.front = [newState.front[2], newState.front[5], newState.front[8], newState.front[1], newState.front[4], newState.front[7], newState.front[0], newState.front[3], newState.front[6]];
+        
+        // Save original values before modification
+        const originalUp = [...newState.up];
+        const originalRight = [...newState.right];
+        const originalDown = [...newState.down];
+        const originalLeft = [...newState.left];
+        
+        // F' move: up bottom row -> left right column
+        newState.left[2] = originalUp[6];
+        newState.left[5] = originalUp[7];
+        newState.left[8] = originalUp[8];
+        
+        // left right column -> down top row
+        newState.down[0] = originalLeft[2];
+        newState.down[1] = originalLeft[5];
+        newState.down[2] = originalLeft[8];
+        
+        // down top row -> right left column (reversed)
+        newState.right[0] = originalDown[2];
+        newState.right[3] = originalDown[1];
+        newState.right[6] = originalDown[0];
+        
+        // right left column -> up bottom row (reversed)
+        newState.up[6] = originalRight[6];
+        newState.up[7] = originalRight[3];
+        newState.up[8] = originalRight[0];
+        break;
+      }
+        
+      case 'D\'': {
+        // D' move: rotate down face counter-clockwise (inverse of D)
+        newState.down = [newState.down[2], newState.down[5], newState.down[8], newState.down[1], newState.down[4], newState.down[7], newState.down[0], newState.down[3], newState.down[6]];
+        
+        // Save original values before modification
+        const originalFront = [...newState.front];
+        const originalRight = [...newState.right];
+        const originalBack = [...newState.back];
+        const originalLeft = [...newState.left];
+        
+        // D' move: front bottom row -> left bottom row
+        newState.left[6] = originalFront[6];
+        newState.left[7] = originalFront[7];
+        newState.left[8] = originalFront[8];
+        
+        // left bottom row -> back bottom row
+        newState.back[6] = originalLeft[6];
+        newState.back[7] = originalLeft[7];
+        newState.back[8] = originalLeft[8];
+        
+        // back bottom row -> right bottom row
+        newState.right[6] = originalBack[6];
+        newState.right[7] = originalBack[7];
+        newState.right[8] = originalBack[8];
+        
+        // right bottom row -> front bottom row
+        newState.front[6] = originalRight[6];
+        newState.front[7] = originalRight[7];
+        newState.front[8] = originalRight[8];
+        break;
+      }
+        
+      case 'L\'': {
+        // L' move: rotate left face counter-clockwise (inverse of L)
+        newState.left = [newState.left[2], newState.left[5], newState.left[8], newState.left[1], newState.left[4], newState.left[7], newState.left[0], newState.left[3], newState.left[6]];
+        
+        // Save original values before modification
+        const originalUp = [...newState.up];
+        const originalBack = [...newState.back];
+        const originalDown = [...newState.down];
+        const originalFront = [...newState.front];
+        
+        // L' move: up left column -> back right column (reversed)
+        newState.back[2] = originalUp[0];
+        newState.back[5] = originalUp[3];
+        newState.back[8] = originalUp[6];
+        
+        // back right column -> down left column (reversed)
+        newState.down[0] = originalBack[8];
+        newState.down[3] = originalBack[5];
+        newState.down[6] = originalBack[2];
+        
+        // down left column -> front left column
+        newState.front[0] = originalDown[0];
+        newState.front[3] = originalDown[3];
+        newState.front[6] = originalDown[6];
+        
+        // front left column -> up left column
+        newState.up[0] = originalFront[0];
+        newState.up[3] = originalFront[3];
+        newState.up[6] = originalFront[6];
+        break;
+      }
+        
+      case 'B\'': {
+        // B' move: rotate back face counter-clockwise (inverse of B)
+        newState.back = [newState.back[2], newState.back[5], newState.back[8], newState.back[1], newState.back[4], newState.back[7], newState.back[0], newState.back[3], newState.back[6]];
+        
+        // Save original values before modification
+        const originalUp = [...newState.up];
+        const originalLeft = [...newState.left];
+        const originalDown = [...newState.down];
+        const originalRight = [...newState.right];
+        
+        // B' move: up top row -> right right column (reversed)
+        newState.right[2] = originalUp[0];
+        newState.right[5] = originalUp[1];
+        newState.right[8] = originalUp[2];
+        
+        // right right column -> down bottom row (reversed)
+        newState.down[6] = originalRight[8];
+        newState.down[7] = originalRight[5];
+        newState.down[8] = originalRight[2];
+        
+        // down bottom row -> left left column
+        newState.left[0] = originalDown[6];
+        newState.left[3] = originalDown[7];
+        newState.left[6] = originalDown[8];
+        
+        // left left column -> up top row
+        newState.up[0] = originalLeft[0];
+        newState.up[1] = originalLeft[3];
+        newState.up[2] = originalLeft[6];
+        break;
+      }
     }
     
     setCubeState(newState);
@@ -517,7 +710,7 @@ function App() {
             <div className="border border-gray-400 rounded p-3 flex-1">
               <div className="text-xs font-semibold text-gray-700 mb-3">Apply Move</div>
               <div className="grid grid-cols-3 gap-1">
-                {['R', 'U', 'F', 'D', 'L', 'B', 'E', 'S', 'M', 'x', 'y', 'z'].map(move => (
+                {['R', 'U', 'F', 'D', 'L', 'B', 'R\'', 'U\'', 'F\'', 'D\'', 'L\'', 'B\''].map(move => (
                   createButton(move, () => applyMove(move))
                 ))}
               </div>
