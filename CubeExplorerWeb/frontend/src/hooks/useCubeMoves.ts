@@ -117,6 +117,8 @@ export default function useCubeMoves() {
 
     return {
         applyMove,
+        applyMoveMatrix,
+        chooseMoveMatrix,
         cubeMoves,
         cubeRotations,
         sliceMoves,

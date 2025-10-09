@@ -5,11 +5,11 @@ import ControlButton from './components/ControlButton';
 import useViewMode from './hooks/useViewMode';
 import { BackendStatus } from './components/BackendStatus';
 import { MoveCubeButtons } from './components/MoveCubeButtons';
-import { CubeFace } from './components/Cube2D/CubeFace';
 import { CubeProvider } from './contexts/CubeContext';
 import { ColorProvider } from './contexts/ColorContext';
 import { useCubeContext, useColorContext } from './hooks/useContexts';
 import { Cube2D } from './components/Cube2D/Cube2D';
+import { ScrambleInput } from './components/ScrambleInput';
 
 
 
@@ -212,6 +212,9 @@ function AppContent() {
               </div>
             </div>
           </div>
+
+          {/* Scramble Input */}
+          <ScrambleInput />
 
           {/* Progress */}
           <div className="text-xs text-gray-600 text-center">
