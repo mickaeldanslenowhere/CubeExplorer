@@ -3,7 +3,7 @@ import { CubeFace } from "./CubeFace"
 export const Cube2D = () => {
     return (
         <div className="bg-gray-100 border border-gray-400 rounded p-4" style={{width: '400px', height: '300px'}}>
-                <div className="grid grid-rows-3 grid-cols-4 gap-2 h-full justify-center items-center">
+                <div className="grid grid-rows-3 grid-cols-4 h-full justify-center items-center">
                   {/* Row 1: Empty, Up, Empty, Empty */}
                   <div></div>
                   <div className="flex justify-center">

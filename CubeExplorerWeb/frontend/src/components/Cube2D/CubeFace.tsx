@@ -9,11 +9,11 @@ export const CubeFace = ({ face }: CubeFaceProps) => {
     const { cubeState, setCubeState } = useCubeContext();
     const { selectedColor, setSelectedColor } = useColorContext();
     return (
-        <div className="grid grid-cols-3 gap-0.5 w-20 h-20">
+        <div className="grid grid-cols-3 border border-gray-600">
             {cubeState[face].map((color, index) => (
                 <div
                     key={index}
-                    className={`w-6 h-6 border border-gray-300 cursor-pointer ${getColor(color).bg}`}
+                    className={`w-6 h-6 border border-gray-600 cursor-pointer ${getColor(color).bg}`}
                     onClick={() => {
                         // If it's a center facelet (index 4), select its color
                         if (index === 4) {
