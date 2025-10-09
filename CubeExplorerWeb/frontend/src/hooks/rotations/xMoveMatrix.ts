@@ -22,9 +22,9 @@ export const xMoveMatrix: MoveMatrix = {
         { face: 'back', index: 6 }, { face: 'back', index: 7 }, { face: 'back', index: 8 },
     ],
     back: [
-        { face: 'front', index: 0 }, { face: 'front', index: 1 }, { face: 'front', index: 2 },
-        { face: 'front', index: 3 }, { face: 'front', index: 4 }, { face: 'front', index: 5 },
-        { face: 'front', index: 6 }, { face: 'front', index: 7 }, { face: 'front', index: 8 },
+        { face: 'up', index: 0 }, { face: 'up', index: 1 }, { face: 'up', index: 2 },
+        { face: 'up', index: 3 }, { face: 'up', index: 4 }, { face: 'up', index: 5 },
+        { face: 'up', index: 6 }, { face: 'up', index: 7 }, { face: 'up', index: 8 },
     ],
     left: [
         { face: 'left', index: 2 }, { face: 'left', index: 5 }, { face: 'left', index: 8 },
