@@ -2,7 +2,7 @@ import useCubeMoves from "./useCubeMoves";
 import { useCubeContext } from "./useContexts";
 
 export const useScramble = () => {
-    const { cubeState, setCubeState } = useCubeContext();
+    const { defaultCubeState, setCubeState } = useCubeContext();
     const { applyMoveMatrix, chooseMoveMatrix, cubeMoves, cubeRotations, sliceMoves } = useCubeMoves();
     const allValidMoves = [...cubeMoves, ...cubeRotations, ...sliceMoves];
 
@@ -36,12 +36,12 @@ export const useScramble = () => {
         const moves = parseScramble(scramble);
         // Build the final state progressively
         let currentState = {
-            up: [...cubeState.up],
-            front: [...cubeState.front],
-            left: [...cubeState.left],
-            right: [...cubeState.right],
-            back: [...cubeState.back],
-            down: [...cubeState.down]
+            up: [...defaultCubeState.up],
+            front: [...defaultCubeState.front],
+            left: [...defaultCubeState.left],
+            right: [...defaultCubeState.right],
+            back: [...defaultCubeState.back],
+            down: [...defaultCubeState.down]
         };
         
         moves.forEach(move => {

@@ -3,7 +3,42 @@ import { useScramble } from '../hooks/useScramble';
 
 export const ScrambleInput = () => {
   const [scrambleText, setScrambleText] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
   const { applyScramble, isValidScramble } = useScramble();
+
+  const handleGenerateScramble = async () => {
+    setIsGenerating(true);
+    try {
+      const response = await fetch('http://localhost:3001/api/generate-scramble', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const generatedScramble = data.scramble;
+      
+      // Set the generated scramble in the input
+      setScrambleText(generatedScramble);
+      
+      // Apply the scramble automatically with reset
+      applyScramble(generatedScramble);
+      
+    } catch (error) {
+      console.error('Error generating scramble:', error);
+      // Fallback to a simple scramble
+      const fallbackScramble = 'R U R';
+      setScrambleText(fallbackScramble);
+      applyScramble(fallbackScramble);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const isScrambleValid = isValidScramble(scrambleText);
 
@@ -22,6 +57,17 @@ export const ScrambleInput = () => {
               : 'border-gray-400'
           }`}
         />
+        <button
+          onClick={handleGenerateScramble}
+          disabled={isGenerating}
+          className={`px-3 py-1 text-xs rounded transition-colors ${
+            isGenerating
+              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              : 'bg-green-600 text-white hover:bg-green-700'
+          }`}
+        >
+          {isGenerating ? 'Generating...' : 'Generate'}
+        </button>
         <button
           onClick={() => applyScramble(scrambleText)}
           disabled={!isScrambleValid}

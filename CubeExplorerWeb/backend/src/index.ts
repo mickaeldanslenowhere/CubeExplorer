@@ -46,6 +46,39 @@ app.get('/api/algorithms', (req, res) => {
   });
 });
 
+// Solve endpoint
+app.post('/api/solve', async (req, res) => {
+  try {
+    const { cubeState } = req.body;
+    
+    if (!cubeState) {
+      return res.status(400).json({ error: 'Cube state is required' });
+    }
+
+    // For now, return a simple solution
+    const resolution = 'R U R';
+    
+    res.json({ resolution });
+  } catch (error) {
+    console.error('Error solving cube:', error);
+    res.status(500).json({ error: 'Failed to solve cube' });
+  }
+});
+
+// Generate scramble endpoint
+app.get('/api/generate-scramble', async (req, res) => {
+  try {
+    // For now, return a simple scramble
+    // Later this will generate a proper WCA-approved scramble
+    const scramble = 'R U R';
+    
+    res.json({ scramble });
+  } catch (error) {
+    console.error('Error generating scramble:', error);
+    res.status(500).json({ error: 'Failed to generate scramble' });
+  }
+});
+
 // Socket.io connection handling
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
