@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useScramble } from '../hooks/useScramble';
+import { useScrambleContext } from '../contexts/ScrambleContext';
 
 export const ScrambleInput = () => {
-  const [scrambleText, setScrambleText] = useState('');
+  const { scrambleText, setScrambleText, clearScramble } = useScrambleContext();
   const [isGenerating, setIsGenerating] = useState(false);
   const { applyScramble, isValidScramble } = useScramble();
 
@@ -78,6 +79,17 @@ export const ScrambleInput = () => {
           }`}
         >
           Apply
+        </button>
+        <button
+          onClick={clearScramble}
+          disabled={!scrambleText}
+          className={`px-3 py-1 text-xs rounded transition-colors ${
+            scrambleText
+              ? 'bg-red-600 text-white hover:bg-red-700'
+              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+          }`}
+        >
+          Clear
         </button>
       </div>
       {scrambleText && !isScrambleValid && (

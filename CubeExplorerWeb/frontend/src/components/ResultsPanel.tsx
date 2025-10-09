@@ -2,6 +2,7 @@ import React from 'react';
 
 interface SolveResult {
   resolution: string;
+  logs?: string[];
   timestamp: string;
 }
 
@@ -10,6 +11,7 @@ interface ResultsPanelProps {
   isSolving: boolean;
   error: string | null;
   onClearResults: () => void;
+  realTimeLogs?: string[];
 }
 
 export const ResultsPanel: React.FC<ResultsPanelProps> = ({
@@ -17,6 +19,7 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = ({
   isSolving,
   error,
   onClearResults,
+  realTimeLogs = [],
 }) => {
   const formatTimestamp = (timestamp: string) => {
     return new Date(timestamp).toLocaleTimeString();
@@ -25,8 +28,20 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = ({
   return (
     <div className="flex-1 bg-gray-50 border border-gray-300 rounded p-4">
       {isSolving && (
-        <div className="text-center py-4">
-          <div className="text-sm text-blue-600">Solving cube...</div>
+        <div className="py-4">
+          <div className="text-sm text-blue-600 mb-2">Solving cube...</div>
+          {realTimeLogs.length > 0 && (
+            <div className="bg-gray-100 border border-gray-200 rounded p-3 max-h-32 overflow-y-auto">
+              <div className="text-xs text-gray-600 font-semibold mb-1">Real-time logs:</div>
+              <div className="space-y-1">
+                {realTimeLogs.map((log, index) => (
+                  <div key={index} className="text-xs text-gray-500 font-mono">
+                    {log}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -68,9 +83,21 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = ({
                 <div className="text-sm font-mono text-gray-800 mb-1">
                   {result.resolution}
                 </div>
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-gray-500 mb-2">
                   {formatTimestamp(result.timestamp)}
                 </div>
+                {result.logs && result.logs.length > 0 && (
+                  <div className="mt-2 border-t border-gray-100 pt-2">
+                    <div className="text-xs text-gray-600 font-semibold mb-1">Logs:</div>
+                    <div className="space-y-1 max-h-32 overflow-y-auto">
+                      {result.logs.map((log, logIndex) => (
+                        <div key={logIndex} className="text-xs text-gray-500 font-mono">
+                          {log}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>

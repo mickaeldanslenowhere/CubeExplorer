@@ -7,6 +7,7 @@ import { BackendStatus } from './components/BackendStatus';
 import { MoveCubeButtons } from './components/MoveCubeButtons';
 import { CubeProvider } from './contexts/CubeContext';
 import { ColorProvider } from './contexts/ColorContext';
+import { ScrambleProvider } from './contexts/ScrambleContext';
 import { useCubeContext, useColorContext } from './hooks/useContexts';
 import { Cube2D } from './components/Cube2D/Cube2D';
 import { ScrambleInput } from './components/ScrambleInput';
@@ -20,7 +21,7 @@ function AppContent() {
   const { selectedColor, setSelectedColor } = useColorContext();
   const { defaultCubeState, cubeState, setCubeState } = useCubeContext();
   const { viewMode, setViewMode } = useViewMode();
-  const { solveCube, clearResults, isSolving, results, error } = useSolve();
+  const { solveCube, cancelSolve, clearResults, isSolving, results, error, realTimeLogs } = useSolve();
 
   // Function to determine if a cubie should be rendered for the L-shape
   // Based on the image: bottom layer + top layer + left column of middle layer
@@ -220,8 +221,8 @@ function AppContent() {
             {/* Scramble Input */}
             <ScrambleInput />
 
-            {/* Solve Button */}
-            <div className="flex justify-center">
+            {/* Solve Buttons */}
+            <div className="flex justify-center space-x-3">
               <ControlButton 
                 label={isSolving ? "Solving..." : "Add and Generate"} 
                 onClick={solveCube}
@@ -230,6 +231,37 @@ function AppContent() {
                   ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
                   : 'bg-green-600 text-white hover:bg-green-700'
                 }`}
+              />
+              {isSolving && (
+                <ControlButton 
+                  label="Cancel" 
+                  onClick={cancelSolve}
+                  className="px-6 py-2 bg-red-600 text-white hover:bg-red-700"
+                />
+              )}
+            </div>
+
+            {/* Test Cancel Button */}
+            <div className="flex justify-center mt-2">
+              <ControlButton 
+                label="Test Cancel" 
+                onClick={async () => {
+                  const controller = new AbortController();
+                  try {
+                    const response = await fetch('http://localhost:3001/api/test-cancel', {
+                      signal: controller.signal
+                    });
+                    const data = await response.json();
+                    console.log('Test result:', data);
+                  } catch (error) {
+                    if (error instanceof Error && error.name === 'AbortError') {
+                      console.log('Test was cancelled');
+                    } else {
+                      console.error('Test error:', error);
+                    }
+                  }
+                }}
+                className="px-4 py-1 bg-blue-600 text-white hover:bg-blue-700 text-sm"
               />
             </div>
           </div>
@@ -242,11 +274,12 @@ function AppContent() {
           <BackendStatus />
 
           {/* Results Panel */}
-          <ResultsPanel 
+          <ResultsPanel
             results={results}
             isSolving={isSolving}
             error={error}
             onClearResults={clearResults}
+            realTimeLogs={realTimeLogs}
           />
 
           {/* Progress */}
@@ -263,7 +296,9 @@ function App() {
   return (
     <CubeProvider>
       <ColorProvider>
-        <AppContent />
+        <ScrambleProvider>
+          <AppContent />
+        </ScrambleProvider>
       </ColorProvider>
     </CubeProvider>
   );

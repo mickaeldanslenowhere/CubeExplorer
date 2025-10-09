@@ -8,12 +8,21 @@ import { AlgorithmService } from './AlgorithmService';
  */
 export class CubeService {
   /**
-   * Solve a cube and return the solution
-   * @param cubeState - The current state of the cube
+   * Solve a cube from a scramble string
+   * @param scramble - The scramble string (e.g., "R U F' D2 L' B")
    * @returns Object containing the resolution moves
    */
-  static async solveCube(cubeState: any): Promise<{ resolution: string }> {
-    return SolveService.solveCube(cubeState);
+  static async solveCube(scramble: string): Promise<{ resolution: string }> {
+    return SolveService.solveCube(scramble);
+  }
+
+  /**
+   * Solve a cube from a scramble string with real-time logs
+   * @param scramble - The scramble string
+   * @param sendLog - Function to send logs in real-time
+   */
+  static async solveCubeWithLogs(scramble: string, sendLog: (message: string) => void): Promise<{ resolution: string }> {
+    return SolveService.solveCubeWithLogs(scramble, sendLog);
   }
 
   /**
