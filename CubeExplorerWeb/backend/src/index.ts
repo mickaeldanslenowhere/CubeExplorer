@@ -5,6 +5,7 @@ import { Server } from 'socket.io';
 import dotenv from 'dotenv';
 import { CubeSolver } from './services/CubeSolver';
 import { CubeState, Move } from './types';
+import cubeRoutes from './routes/cubeRoutes';
 
 dotenv.config();
 
@@ -25,59 +26,7 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'OK', 
-    message: 'CubeExplorer API is running',
-    timestamp: new Date().toISOString(),
-    version: '1.0.0'
-  });
-});
-
-app.get('/api/algorithms', (req, res) => {
-  res.json({
-    methods: ['CFOP', 'Roux', 'ZZ', 'Petrus'],
-    algorithms: {
-      cross: ['F', 'R', 'U', 'R\'', 'F\''],
-      f2l: ['R', 'U', 'R\'', 'U\''],
-      oll: ['F', 'R', 'U', 'R\'', 'U\'', 'F\''],
-      pll: ['R', 'U', 'R\'', 'F', 'R', 'U', 'R\'', 'F\'']
-    }
-  });
-});
-
-// Solve endpoint
-app.post('/api/solve', async (req, res) => {
-  try {
-    const { cubeState } = req.body;
-    
-    if (!cubeState) {
-      return res.status(400).json({ error: 'Cube state is required' });
-    }
-
-    // For now, return a simple solution
-    const resolution = 'R U R';
-    
-    res.json({ resolution });
-  } catch (error) {
-    console.error('Error solving cube:', error);
-    res.status(500).json({ error: 'Failed to solve cube' });
-  }
-});
-
-// Generate scramble endpoint
-app.get('/api/generate-scramble', async (req, res) => {
-  try {
-    // For now, return a simple scramble
-    // Later this will generate a proper WCA-approved scramble
-    const scramble = 'R U R';
-    
-    res.json({ scramble });
-  } catch (error) {
-    console.error('Error generating scramble:', error);
-    res.status(500).json({ error: 'Failed to generate scramble' });
-  }
-});
+app.use('/api', cubeRoutes);
 
 // Socket.io connection handling
 io.on('connection', (socket) => {
