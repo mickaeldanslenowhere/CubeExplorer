@@ -36,7 +36,7 @@ export const ScrambleInput = () => {
       </div>
       {scrambleText && !isScrambleValid && (
         <div className="text-xs text-red-600 mt-1">
-          Invalid moves detected. Valid moves: R, U, F, D, L, B, R', U', F', D', L', B', E, S, M, E', S', M', x, y, z, x', y', z'
+          Invalid moves detected. Valid moves: R, U, F, D, L, B, R', U', F', D', L', B', R2, U2, F2, D2, L2, B2, E, S, M, E', S', M', E2, S2, M2, x, y, z, x', y', z', x2, y2, z2
         </div>
       )}
     </div>

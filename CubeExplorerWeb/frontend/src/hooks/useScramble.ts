@@ -7,7 +7,22 @@ export const useScramble = () => {
     const allValidMoves = [...cubeMoves, ...cubeRotations, ...sliceMoves];
 
     const parseScramble = (scramble: string): string[] => {
-        return scramble.trim().split(/\s+/).filter(move => move.length > 0);
+        const moves = scramble.trim().split(/\s+/).filter(move => move.length > 0);
+        const expandedMoves: string[] = [];
+        
+        moves.forEach(move => {
+            // Check if it's a double move (e.g., U2, R2, F2, etc.)
+            if (move.length === 2 && move[1] === '2') {
+                const baseMove = move[0];
+                // Expand U2 to U U, R2 to R R, etc.
+                expandedMoves.push(baseMove, baseMove);
+            } else {
+                // Regular move (single or prime)
+                expandedMoves.push(move);
+            }
+        });
+        
+        return expandedMoves;
       };
 
     const isValidScramble = (scramble: string): boolean => {
