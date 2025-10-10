@@ -40,7 +40,10 @@ export class CubeController {
     CancellationManager.reset();
     
     try {
-      const { scramble } = req.body;
+      let { scramble } = req.body;
+      if (!scramble) {
+        scramble = req.query.scramble as string;
+      }
       console.log(`📝 [API] Scramble received: "${scramble}"`);
       
       if (!scramble) {
@@ -64,16 +67,47 @@ export class CubeController {
         'Access-Control-Allow-Headers': 'Cache-Control'
       });
 
-      const sendLog = (message: string) => {
-        res.write(`data: ${JSON.stringify({ type: 'log', message })}\n\n`);
+      const logger = {
+        log: (message: string, sendToFrontend: boolean = false) => {
+          console.log(`📡 [SSE] ${message}`);
+          if (sendToFrontend) {
+            res.write(`data: ${JSON.stringify({ type: 'log', message })}\n\n`);
+          }
+        },
+        error: (message: string, sendToFrontend: boolean = false) => {
+          console.error(`📡 [SSE] ❌ ${message}`);
+          if (sendToFrontend) {
+            res.write(`data: ${JSON.stringify({ type: 'log', message: `❌ ${message}` })}\n\n`);
+          }
+        },
+        warn: (message: string, sendToFrontend: boolean = false) => {
+          console.warn(`📡 [SSE] ⚠️ ${message}`);
+          if (sendToFrontend) {
+            res.write(`data: ${JSON.stringify({ type: 'log', message: `⚠️ ${message}` })}\n\n`);
+          }
+        },
+        debug: (message: string, sendToFrontend: boolean = false) => {
+          console.debug(`📡 [SSE] 🐛 ${message}`);
+          if (sendToFrontend) {
+            res.write(`data: ${JSON.stringify({ type: 'log', message: `🐛 ${message}` })}\n\n`);
+          }
+        },
+        info: (message: string, sendToFrontend: boolean = false) => {
+          console.info(`📡 [SSE] ℹ️ ${message}`);
+          if (sendToFrontend) {
+            res.write(`data: ${JSON.stringify({ type: 'log', message: `ℹ️ ${message}` })}\n\n`);
+          }
+        }
       };
 
       const sendResult = (result: any) => {
+        console.log(`📡 [SSE] Result: ${JSON.stringify(result)}`);
         res.write(`data: ${JSON.stringify({ type: 'result', data: result })}\n\n`);
         res.end();
       };
 
       const sendError = (error: string) => {
+        console.log(`📡 [SSE] Error: ${error}`);
         res.write(`data: ${JSON.stringify({ type: 'error', message: error })}\n\n`);
         res.end();
       };
@@ -81,7 +115,7 @@ export class CubeController {
       console.log('🚀 [API] Calling CubeService.solveCube with real-time logs...');
       
       // Call the service with real-time logging
-      const result = await CubeService.solveCubeWithLogs(scramble, sendLog);
+      const result = await CubeService.solveCubeWithLogs(scramble, logger);
       
       const totalTime = Date.now() - startTime;
       console.log(`✅ [API] Solve request completed in ${totalTime}ms`);
@@ -93,83 +127,14 @@ export class CubeController {
       if (CancellationManager.isCancelled) {
         console.log(`⚠️ [API] Solve operation was cancelled after ${totalTime}ms`);
         if (!res.headersSent) {
+          console.log(`📡 [SSE] Error: Request was cancelled`);
           res.write(`data: ${JSON.stringify({ type: 'error', message: 'Request was cancelled' })}\n\n`);
           res.end();
         }
       } else {
         console.error(`❌ [API] Error solving cube after ${totalTime}ms:`, error);
         if (!res.headersSent) {
-          res.write(`data: ${JSON.stringify({ type: 'error', message: 'Failed to solve cube' })}\n\n`);
-          res.end();
-        }
-      }
-    }
-  }
-
-  /**
-   * Solve a cube from a scramble string with real-time logs via Server-Sent Events
-   */
-  static async solveCubeStream(req: Request, res: Response): Promise<void> {
-    const startTime = Date.now();
-    console.log(`🔧 [API] Solve stream request received at ${new Date().toISOString()}`);
-    
-    // Reset cancellation flag
-    CancellationManager.reset();
-    
-    try {
-      const { scramble } = req.query;
-      console.log(`📝 [API] Scramble received: "${scramble}"`);
-      
-      if (!scramble || typeof scramble !== 'string') {
-        console.log('❌ [API] No scramble provided');
-        res.status(400).json({ error: 'Scramble string is required' });
-        return;
-      }
-
-      // Set up Server-Sent Events
-      res.writeHead(200, {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Cache-Control'
-      });
-
-      const sendLog = (message: string) => {
-        res.write(`data: ${JSON.stringify({ type: 'log', message })}\n\n`);
-      };
-
-      const sendResult = (result: any) => {
-        res.write(`data: ${JSON.stringify({ type: 'result', data: result })}\n\n`);
-        res.end();
-      };
-
-      const sendError = (error: string) => {
-        res.write(`data: ${JSON.stringify({ type: 'error', message: error })}\n\n`);
-        res.end();
-      };
-
-      console.log('🚀 [API] Calling CubeService.solveCube with real-time logs...');
-      
-      // Call the service with real-time logging
-      const result = await CubeService.solveCubeWithLogs(scramble, sendLog);
-      
-      const totalTime = Date.now() - startTime;
-      console.log(`✅ [API] Solve stream request completed in ${totalTime}ms`);
-      
-      sendResult(result);
-    } catch (error) {
-      const totalTime = Date.now() - startTime;
-      
-      if (CancellationManager.isCancelled) {
-        console.log(`⚠️ [API] Solve operation was cancelled after ${totalTime}ms`);
-        if (!res.headersSent) {
-          res.write(`data: ${JSON.stringify({ type: 'error', message: 'Request was cancelled' })}\n\n`);
-          res.end();
-        }
-      } else {
-        console.error(`❌ [API] Error solving cube after ${totalTime}ms:`, error);
-        if (!res.headersSent) {
+          console.log(`📡 [SSE] Error: Failed to solve cube`);
           res.write(`data: ${JSON.stringify({ type: 'error', message: 'Failed to solve cube' })}\n\n`);
           res.end();
         }

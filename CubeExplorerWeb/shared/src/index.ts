@@ -1,3 +1,2 @@
-// Export all shared modules
-export * from './types';
-export * from './cube-algorithms';
+// Main export file for the shared package
+export * from './cube';

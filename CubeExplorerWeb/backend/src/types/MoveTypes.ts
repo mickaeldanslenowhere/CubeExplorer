@@ -16,12 +16,6 @@ export type SliceMove = 'E' | 'E2' | 'E\'' | 'S' | 'S2' | 'S\'' | 'M' | 'M2' | '
 // Cube rotations
 export type CubeRotation = 'x' | 'x2' | 'x\'' | 'y' | 'y2' | 'y\'' | 'z' | 'z2' | 'z\'';
 
-// Move arrays for different phases
-export const PHASE1_MOVES: Move[] = [
-  'U', 'U2', 'U\'', 'R', 'R2', 'R\'', 'F', 'F2', 'F\'',
-  'D', 'D2', 'D\'', 'L', 'L2', 'L\'', 'B', 'B2', 'B\''
-];
-
 export const PHASE2_MOVES: Move[] = [
   'U', 'U2', 'U\'', 'R', 'R2', 'R\'', 'F', 'F2', 'F\'',
   'D', 'D2', 'D\'', 'L', 'L2', 'L\'', 'B', 'B2', 'B\'',

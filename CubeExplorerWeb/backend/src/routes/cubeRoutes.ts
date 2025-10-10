@@ -11,7 +11,7 @@ router.get('/algorithms', CubeController.getAlgorithms);
 
 // Solve cube
 router.post('/solve', CubeController.solveCube);
-router.get('/solve-stream', CubeController.solveCubeStream);
+router.get('/solve-stream', CubeController.solveCube);
 
 // Cancel solve
 router.post('/cancel', CubeController.cancelSolve);
