@@ -1,11 +1,6 @@
 import { FinalTwoPhaseSolver } from './FinalTwoPhaseSolver';
 import { CancellationManager } from '../utils/CancellationManager';
-import { 
-  CubieCube, 
-  CornerCubie, 
-  EdgeCubie, 
-  CenterCubie
-} from '../types/CubeTypes';
+import { Logger } from '../utils/Logger';
 import { VALID_WCA_MOVES } from '../types/MoveTypes';
 import CubeState from '@cube-explorer/shared/src/cube/CubeState';
 import { applyScramble } from '@cube-explorer/shared/src/cube/CubeMove';
@@ -16,17 +11,16 @@ export class SolveService {
   /**
    * Solve a cube from a scramble string with real-time logs
    * @param scramble - The scramble string
-   * @param sendLog - Function to send logs in real-time
    */
-  static async solveCubeWithLogs(scramble: string, logger: any): Promise<{ resolution: string }> {
+  static async solveCubeWithLogs(scramble: string): Promise<{ resolution: string }> {
     const startTime = Date.now();
-    logger.log(`🔧 Starting cube solving for scramble: "${scramble}"`, true);
-    logger.log(`🧪 Testing scramble: ${scramble}`, false);
+    Logger.log(`🔧 Starting cube solving for scramble: "${scramble}"`, { sendToFrontend: true });
+    Logger.log(`🧪 Testing scramble: ${scramble}`);
     
     try {
       // Check if operation was cancelled
       if (CancellationManager.isCancelled) {
-        logger.error('Operation was cancelled by user', true);
+        Logger.error('Operation was cancelled by user', { sendToFrontend: true });
         return { resolution: 'Operation cancelled by user' };
       }
       
@@ -36,11 +30,11 @@ export class SolveService {
         throw new Error('Invalid scramble format');
       }
       const validationTime = Date.now() - validationStartTime;
-      logger.info(`Scramble validation completed in ${validationTime}ms`, true);
+      Logger.info(`Scramble validation completed in ${validationTime}ms`, { sendToFrontend: true });
 
       // Check if operation was cancelled
       if (CancellationManager.isCancelled) {
-        logger.error('Operation was cancelled by user', true);
+        Logger.error('Operation was cancelled by user', { sendToFrontend: true });
         return { resolution: 'Operation cancelled by user' };
       }
 
@@ -48,40 +42,40 @@ export class SolveService {
       const conversionStartTime = Date.now();
 
 
-      console.log(`🔄 Converting scramble to cube state: "${scramble}"`);
+      Logger.log(`🔄 Converting scramble to cube state: "${scramble}"`);
     
       // Use the shared cube logic to get the scrambled cube state
       const cubeState = new CubeState();
       applyScramble(cubeState, scramble);
-      console.log(`📊 Frontend cube state: ${cubeState.toString()}`);
+      Logger.log(`📊 Frontend cube state: ${cubeState.toString()}`);
 
       const conversionTime = Date.now() - conversionStartTime;
-      logger.info(`Scramble converted to cube state in ${conversionTime}ms`, true);
+      Logger.info(`Scramble converted to cube state in ${conversionTime}ms`, { sendToFrontend: true });
       
       // Check if operation was cancelled
       if (CancellationManager.isCancelled) {
-        logger.error('Operation was cancelled by user', true);
+        Logger.error('Operation was cancelled by user', { sendToFrontend: true });
         return { resolution: 'Operation cancelled by user' };
       }
       
       // Use the Two-Phase Algorithm to solve the cube
       const solvingStartTime = Date.now();
-      const solution = await FinalTwoPhaseSolver.solveWithLogs(cubeState, logger);
+      const solution = await FinalTwoPhaseSolver.solveWithLogs(cubeState);
       const solvingTime = Date.now() - solvingStartTime;
       
       // Check if solution was cancelled (empty array)
       if (solution.length === 0) {
-        logger.error('Operation was cancelled by user during solving', true);
+        Logger.error('Operation was cancelled by user during solving', { sendToFrontend: true });
         return { resolution: 'Operation cancelled by user' };
       }
       
-      logger.info(`Two-Phase Algorithm completed in ${solvingTime}ms with solution: [${solution.join(', ')}]`, true);
+      Logger.info(`Two-Phase Algorithm completed in ${solvingTime}ms with solution: [${solution.join(', ')}]`, { sendToFrontend: true });
       
       // Convert solution array to string
       const resolution = solution.join(' ');
       
       const totalTime = Date.now() - startTime;
-      logger.info(`Total solving time: ${totalTime}ms`, true);
+      Logger.info(`Total solving time: ${totalTime}ms`, { sendToFrontend: true });
       
       return {
         resolution: resolution || 'No solution found'
@@ -89,7 +83,7 @@ export class SolveService {
     } catch (error) {
       const totalTime = Date.now() - startTime;
       const errorMessage = `❌ Error solving cube after ${totalTime}ms: ${error}`;
-      logger.error(errorMessage, true);
+      Logger.error(errorMessage, { sendToFrontend: true });
       return {
         resolution: 'Error: Unable to solve cube'
       };
@@ -137,7 +131,7 @@ export class SolveService {
       if (i > 0) {
         const previousFace = moves[i - 1][0];
         if (currentFace === previousFace) {
-          console.log(`❌ Invalid scramble: consecutive moves on same face (${moves[i-1]} ${currentMove})`);
+          Logger.error(`❌ Invalid scramble: consecutive moves on same face (${moves[i-1]} ${currentMove})`);
           return false;
         }
       }
@@ -152,7 +146,7 @@ export class SolveService {
         if (previousFace === oppositeFaces[twoMovesAgoFace]) {
           // If so, current move cannot be on either of those faces
           if (currentFace === twoMovesAgoFace || currentFace === previousFace) {
-            console.log(`❌ Invalid scramble: three-move pattern on opposite faces (${moves[i-2]} ${moves[i-1]} ${currentMove})`);
+            Logger.error(`❌ Invalid scramble: three-move pattern on opposite faces (${moves[i-2]} ${moves[i-1]} ${currentMove})`);
             return false;
           }
         }
@@ -163,27 +157,5 @@ export class SolveService {
   }
 
 
-  /**
-   * Validate if a cube state is solvable
-   * @param cubeState - The cube state to validate
-   * @returns Boolean indicating if the state is solvable
-   */
-  static isSolvable(cubeState: any): boolean {
-    // For now, assume all valid states are solvable
-    // In a full implementation, this would check parity and other constraints
-    return true;
-  }
 
-  /**
-   * Get solving statistics for a cube state
-   * @param cubeState - The cube state
-   * @returns Object containing solving statistics
-   */
-  static getSolvingStats(cubeState: any): { estimatedMoves: number, difficulty: string } {
-    // Simplified statistics based on the Two-Phase Algorithm
-    return {
-      estimatedMoves: 20, // Typical Two-Phase Algorithm solution length
-      difficulty: 'Medium'
-    };
-  }
 }

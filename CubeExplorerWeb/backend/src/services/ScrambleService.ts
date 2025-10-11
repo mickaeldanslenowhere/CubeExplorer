@@ -12,6 +12,7 @@ import {
   CENTERS
 } from '../types/CubeTypes';
 import { TWO_PHASE_CONSTANTS } from '../types/TwoPhaseTypes';
+import { Logger } from '../utils/Logger';
 
 export class ScrambleService {
   /**
@@ -38,7 +39,7 @@ export class ScrambleService {
    */
   static async generateScramble(): Promise<{ scramble: string }> {
     const startTime = Date.now();
-    console.log('🎲 Starting WCA scramble generation...');
+    Logger.log('🎲 Starting WCA scramble generation...');
     
     // Step 1: Generate random coordinates for each cube aspect
     // This mimics the MT_RandNext() function from the original Pascal code
@@ -52,31 +53,31 @@ export class ScrambleService {
     const n5 = Math.floor(Math.random() * this.CENTER_ORI_RANGE);       // How the 6 centers are rotated
     const coordTime = Date.now() - coordStartTime;
     
-    console.log(`📊 Generated coordinates in ${coordTime}ms: n1=${n1}, n2=${n2}, n3=${n3}, n4=${n4}, n5=${n5}`);
+    Logger.log(`📊 Generated coordinates in ${coordTime}ms: n1=${n1}, n2=${n2}, n3=${n3}, n4=${n4}, n5=${n5}`);
 
     // Step 2: Create a cube state from these random coordinates
     // This now uses the FULL implementation with proper coordinate conversion
     const cubeStartTime = Date.now();
     const cube = this.createCubeFromCoordinates(n1, n2, n3, n4, n5);
     const cubeTime = Date.now() - cubeStartTime;
-    console.log(`🧩 Created cube state from coordinates in ${cubeTime}ms`);
+    Logger.log(`🧩 Created cube state from coordinates in ${cubeTime}ms`);
     
     // Step 3: Apply parity corrections to ensure the cube is solvable
     // In Rubik's cubes, certain combinations are impossible - this fixes them
     const parityStartTime = Date.now();
     this.applyParityCorrections(cube);
     const parityTime = Date.now() - parityStartTime;
-    console.log(`⚖️ Applied parity corrections in ${parityTime}ms`);
+    Logger.log(`⚖️ Applied parity corrections in ${parityTime}ms`);
     
     // Step 4: Convert the scrambled cube state into a sequence of moves
     // This now uses the FULL implementation with proper solving and inversion
     const scrambleStartTime = Date.now();
     const scramble = this.cubeStateToScramble(cube);
     const scrambleTime = Date.now() - scrambleStartTime;
-    console.log(`🎯 Generated scramble in ${scrambleTime}ms: ${scramble}`);
+    Logger.log(`🎯 Generated scramble in ${scrambleTime}ms: ${scramble}`);
     
     const totalTime = Date.now() - startTime;
-    console.log(`⏱️ Total scramble generation time: ${totalTime}ms`);
+    Logger.log(`⏱️ Total scramble generation time: ${totalTime}ms`);
     
     return { scramble };
   }
@@ -97,42 +98,6 @@ export class ScrambleService {
     return scrambles;
   }
 
-  /**
-   * Validate a scramble string to ensure it contains only valid WCA moves
-   * 
-   * Checks that:
-   * - The input is a non-empty string
-   * - Each move in the sequence is a valid WCA notation move
-   * - Supports face turns (R, U, F, D, L, B), slice moves (E, S, M), and cube rotations (x, y, z)
-   * - Supports all modifiers: single (no suffix), prime ('), and double (2)
-   * 
-   * @param scramble - The scramble string to validate (e.g., "R U F' D2 L' B")
-   * @returns Boolean indicating if the scramble is valid
-   */
-  static validateScramble(scramble: string): boolean {
-    // Basic input validation
-    if (!scramble || typeof scramble !== 'string') return false;
-    
-    // Define all valid WCA moves and their modifiers
-    const validMoves = [
-      // Face turns: R, U, F, D, L, B with all modifiers
-      'R', 'U', 'F', 'D', 'L', 'B',           // Single turns
-      'R\'', 'U\'', 'F\'', 'D\'', 'L\'', 'B\'', // Prime turns (counter-clockwise)
-      'R2', 'U2', 'F2', 'D2', 'L2', 'B2',     // Double turns (180°)
-      // Slice moves: E, S, M with all modifiers
-      'E', 'S', 'M',                           // Single slice moves
-      'E\'', 'S\'', 'M\'',                     // Prime slice moves
-      'E2', 'S2', 'M2',                        // Double slice moves
-      // Cube rotations: x, y, z with all modifiers
-      'x', 'y', 'z',                           // Single cube rotations
-      'x\'', 'y\'', 'z\'',                     // Prime cube rotations
-      'x2', 'y2', 'z2'                         // Double cube rotations
-    ];
-    
-    // Split the scramble into individual moves and validate each one
-    const moves = scramble.trim().split(/\s+/);
-    return moves.every(move => validMoves.includes(move));
-  }
 
   /**
    * Create a cube state from random coordinates
@@ -367,7 +332,7 @@ export class ScrambleService {
    * @returns Scramble string in WCA notation (e.g., "R U F' D2 L' B...")
    */
   private static cubeStateToScramble(cube: CubieCube): string {
-    console.log('🎯 Generating WCA-compliant scramble sequence...');
+    Logger.log('🎯 Generating WCA-compliant scramble sequence...');
     
     // WCA scramble rules:
     // 1. No consecutive moves on the same face (F F' is invalid)
@@ -416,7 +381,7 @@ export class ScrambleService {
     }
     
     const scramble = scrambleMoves.join(' ');
-    console.log(`🎯 Generated WCA-compliant scramble: ${scramble}`);
+    Logger.log(`🎯 Generated WCA-compliant scramble: ${scramble}`);
     
     return scramble;
   }

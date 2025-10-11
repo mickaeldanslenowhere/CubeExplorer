@@ -2,12 +2,13 @@
 // This version uses real move tables based on the original Pascal code
 
 import { CancellationManager } from '../utils/CancellationManager';
+import { Logger } from '../utils/Logger';
 
 import { 
   TWO_PHASE_CONSTANTS 
 } from '../types/TwoPhaseTypes';
 import CubeState from '@cube-explorer/shared/src/cube/CubeState';
-import { allValidMoves, applyMove, cubeMoves } from '@cube-explorer/shared';
+import { applyMove, cubeMoves } from '@cube-explorer/shared';
 
 export class FinalTwoPhaseSolver {
   // Constants from original Pascal code
@@ -19,44 +20,30 @@ export class FinalTwoPhaseSolver {
   /**
    * Solve a cube using the final Two-Phase Algorithm with real-time logs
    * @param cube - The cube to solve
-   * @param logger - Logger object for real-time logs
    */
-  static async solveWithLogs(cube: CubeState, logger: any): Promise<string[]> {
+  static async solveWithLogs(cube: CubeState): Promise<string[]> {
     const startTime = Date.now();
-    logger.log('Starting Two-Phase Algorithm...', true);
-    
-    // Check if operation was cancelled
-    if (CancellationManager.isCancelled) {
-      logger.error('Operation was cancelled by user', true);
-      return [];
-    }
+    Logger.log('Starting Two-Phase Algorithm...', { sendToFrontend: true });
     
     // Phase 1: Solve to subgroup H
     const phase1StartTime = Date.now();
-    const phase1Solution = await this.solvePhase1(cube, logger);
+    const phase1Solution = await this.solvePhase1(cube);
     const phase1Time = Date.now() - phase1StartTime;
-    logger.info(`Phase 1 completed in ${phase1Time}ms with solution: [${phase1Solution.join(', ')}]`, true);
+    Logger.info(`Phase 1 completed in ${phase1Time}ms with solution: [${phase1Solution.join(', ')}]`, { sendToFrontend: true });
     
     // Check if operation was cancelled
     if (CancellationManager.isCancelled) {
-      logger.error('Operation was cancelled by user', true);
+      Logger.error('Operation was cancelled by user', { sendToFrontend: true });
       return [];
     }
-    
-
-    
-    // Check if operation was cancelled
-    if (CancellationManager.isCancelled) {
-      logger.error('Operation was cancelled by user', true);
-      return [];
-    }
+ 
     
     // Combine solutions
     const totalSolution = [...phase1Solution];
     
     const totalTime = Date.now() - startTime;
-    logger.info(`Two-Phase Algorithm completed successfully in ${totalTime}ms`, true);
-    logger.info(`Total solution: [${totalSolution.join(', ')}]`, true);
+    Logger.info(`Two-Phase Algorithm completed successfully in ${totalTime}ms`, { sendToFrontend: true });
+    Logger.info(`Total solution: [${totalSolution.join(', ')}]`, { sendToFrontend: true });
     
     return totalSolution;
   }
@@ -65,89 +52,58 @@ export class FinalTwoPhaseSolver {
    * Solve Phase 1 using IDA* search with real move tables
    * @param state - Phase 1 state
    */
-  private static async solvePhase1(state: CubeState, logger?: any): Promise<string[]> {
+  private static async solvePhase1(state: CubeState): Promise<string[]> {
     if (state.isSolved()) {
-      if (logger) {
-        logger.info('Phase 1 already solved', true);
-      } else {
-        console.log('✅ Phase 1 already solved');
-      }
+      Logger.info('Phase 1 already solved', { sendToFrontend: true });
       return [];
     }
 
-    if (logger) {
-      logger.info(`Starting Phase 1 IDA* search (max depth: ${this.MAX_PHASE1_DEPTH})`, true);
-    } else {
-      console.log(`🔍 Starting Phase 1 IDA* search (max depth: ${this.MAX_PHASE1_DEPTH})`);
-    }
+    Logger.info(`Starting Phase 1 search (max depth: ${this.MAX_PHASE1_DEPTH})`, { sendToFrontend: true });
     
     // IDA* search
     for (let depth = 0; depth <= this.MAX_PHASE1_DEPTH; depth++) {
       // Check if operation was cancelled
       if (CancellationManager.isCancelled) {
-        if (logger) {
-          logger.error('Operation was cancelled by user', true);
-        } else {
-          throw new Error('Operation was cancelled');
-        }
+        Logger.error('Operation was cancelled by user', { sendToFrontend: true });
         return [];
       }
       
       // Sleep .5 seconds before each depth change
-      if (depth > 0 && logger) {
+      if (depth > 0) {
         // free the thread a bit
         await new Promise(resolve => setImmediate(resolve));
         
         // Check if operation was cancelled during sleep
         if (CancellationManager.isCancelled) {
-          logger.error('Operation was cancelled by user during sleep', true);
+          Logger.error('Operation was cancelled by user during sleep', { sendToFrontend: true });
           return [];
         }
       }
       
       const depthStartTime = Date.now();
-      if (logger) {
-        logger.info(`Searching Phase 1 at depth ${depth}...`, true);
-      } else {
-        console.log(`🔍 Searching Phase 1 at depth ${depth}...`);
-      }
+      Logger.info(`Searching Phase 1 at depth ${depth}...`, { sendToFrontend: true });
       
       try {
-        const solution = await this.searchPhase1(state, depth, [], logger);
+        const solution = await this.searchPhase1(state, depth, []);
         const depthTime = Date.now() - depthStartTime;
         
         if (solution.length > 0) {
-          if (logger) {
-            logger.info(`Phase 1 solution found at depth ${depth} in ${depthTime}ms: [${solution.join(', ')}]`, true);
-          } else {
-            console.log(`✅ Phase 1 solution found at depth ${depth} in ${depthTime}ms: [${solution.join(', ')}]`);
-          }
+          Logger.info(`Phase 1 solution found at depth ${depth} in ${depthTime}ms: [${solution.join(', ')}]`, { sendToFrontend: true, prefix: '✅' });
           return solution;
         } else {
-          if (logger) {
-            logger.info(`No solution found at depth ${depth} in ${depthTime}ms`, true);
-          } else {
-            console.log(`❌ No solution found at depth ${depth} in ${depthTime}ms`);
-          }
+          Logger.info(`No solution found at depth ${depth} in ${depthTime}ms`, { sendToFrontend: true, prefix: '❌' });
+          
         }
       } catch (error) {
         if (error instanceof Error && error.message === 'Operation was cancelled') {
-          if (logger) {
-            logger.warn(`Phase 1 search cancelled at depth ${depth}`, true);
-          } else {
-            console.log(`⚠️ Phase 1 search cancelled at depth ${depth}`);
-          }
+          Logger.warn(`Phase 1 search cancelled at depth ${depth}`, { sendToFrontend: true, prefix: '⚠️' });
           throw error;
         }
         throw error;
       }
     }
 
-    if (logger) {
-      logger.error('Phase 1 search failed - no solution found', true);
-    } else {
-      console.log('❌ Phase 1 search failed - no solution found');
-    }
+    Logger.error('Phase 1 search failed - no solution found', { sendToFrontend: true, prefix: '❌' });
     return [];
   }
 
@@ -158,10 +114,10 @@ export class FinalTwoPhaseSolver {
    * @param depth - Remaining depth
    * @param path - Current move path
    */
-  private static async searchPhase1(state: CubeState, depth: number, path: string[], logger?: any): Promise<string[]> {
+  private static async searchPhase1(state: CubeState, depth: number, path: string[]): Promise<string[]> {
     // Check if operation was cancelled
     if (CancellationManager.isCancelled) {
-      console.log('❌ Operation was cancelled by user');
+      Logger.error('Operation was cancelled by user', { sendToFrontend: true, prefix: '❌' });
       return [];
     }
 
@@ -174,23 +130,17 @@ export class FinalTwoPhaseSolver {
     for (const move of cubeMoves) {
       const workingState = state.clone();
       if (CancellationManager.isCancelled) {
-        console.log('❌ Operation was cancelled by user during search');
+        Logger.error('Operation was cancelled by user during search', { sendToFrontend: true, prefix: '❌' });
         return [];
       }
       moveCount++;
 
-      if (this.isRedundantMove(path, move)) {
-        continue;
-      }
-
       const newPath = [...path, move];
       // Log the current move being tested
-      if (logger) {
-        logger.debug(`🔍 Phase 1 testing move: ${move} (path: [${newPath.join(', ')}])`, false);
-      }
+      Logger.debug(`🔍 Phase 1 testing move: ${move} (path: [${newPath.join(', ')}])`);
       applyMove(workingState, move);
 
-      const solution = await this.searchPhase1(workingState, depth - 1, newPath, logger);
+      const solution = await this.searchPhase1(workingState, depth - 1, newPath);
       if (solution.length > 0) {
         return solution;
       }

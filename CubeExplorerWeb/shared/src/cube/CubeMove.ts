@@ -125,8 +125,9 @@ const parseScramble = (scramble: string): string[] => {
 };
 
 const isValidScramble = (scramble: string): boolean => {
-    if (!scramble.trim()) return false;
+    if (!scramble || typeof scramble !== 'string' || !scramble.trim()) return false;
     const moves = parseScramble(scramble);
+    // TODO: Add WCA scramble rules and double moves
     return moves.every(move => allValidMoves.includes(move));
 }
 

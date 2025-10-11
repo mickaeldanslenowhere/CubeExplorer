@@ -26,7 +26,7 @@ export const useSolve = () => {
       }
       
       // Use Server-Sent Events for real-time logs
-      const eventSource = new EventSource(`http://localhost:3001/api/solve-stream?scramble=${encodeURIComponent(scrambleText)}`);
+      const eventSource = new EventSource(`http://localhost:3001/api/solve?scramble=${encodeURIComponent(scrambleText)}`);
       
       const logs: string[] = [];
       let resolution = '';
@@ -72,6 +72,7 @@ export const useSolve = () => {
       };
       
       // Store event source for cancellation
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       abortControllerRef.current = { close: () => eventSource.close() } as any;
       
     } catch (err) {
