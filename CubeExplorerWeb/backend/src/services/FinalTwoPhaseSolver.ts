@@ -19,18 +19,12 @@ export class FinalTwoPhaseSolver {
   /**
    * Solve a cube using the final Two-Phase Algorithm with real-time logs
    * @param cube - The cube to solve
-   * @param sendLog - Function to send logs in real-time
+   * @param logger - Logger object for real-time logs
    */
   static async solveWithLogs(cube: CubeState, logger: any): Promise<string[]> {
     const startTime = Date.now();
     logger.log('Starting Two-Phase Algorithm...', true);
     
-    // Check if operation was cancelled
-    if (CancellationManager.isCancelled) {
-      logger.error('Operation was cancelled by user', true);
-      return [];
-    }
-   
     // Check if operation was cancelled
     if (CancellationManager.isCancelled) {
       logger.error('Operation was cancelled by user', true);
@@ -48,7 +42,15 @@ export class FinalTwoPhaseSolver {
       logger.error('Operation was cancelled by user', true);
       return [];
     }
+    
 
+    
+    // Check if operation was cancelled
+    if (CancellationManager.isCancelled) {
+      logger.error('Operation was cancelled by user', true);
+      return [];
+    }
+    
     // Combine solutions
     const totalSolution = [...phase1Solution];
     
@@ -91,10 +93,10 @@ export class FinalTwoPhaseSolver {
         return [];
       }
       
-      // Sleep 15 seconds before each depth change
+      // Sleep .5 seconds before each depth change
       if (depth > 0 && logger) {
-        logger.info(`Waiting 1 seconds before searching depth ${depth}...`, true);
-        await new Promise(resolve => setTimeout(resolve, 3000));
+        // free the thread a bit
+        await new Promise(resolve => setImmediate(resolve));
         
         // Check if operation was cancelled during sleep
         if (CancellationManager.isCancelled) {
@@ -169,7 +171,7 @@ export class FinalTwoPhaseSolver {
 
     // Try all moves
     let moveCount = 0;
-    for (const move of allValidMoves) {
+    for (const move of cubeMoves) {
       const workingState = state.clone();
       if (CancellationManager.isCancelled) {
         console.log('❌ Operation was cancelled by user during search');
@@ -181,28 +183,19 @@ export class FinalTwoPhaseSolver {
         continue;
       }
 
-      console.log("--------------------------------");
-      console.log(`🔍 Applying move: ${move}`);
-      console.log(`🔍 Current state before move: ${workingState.toString()}`);
-      applyMove(workingState, move);
-      console.log(`🔍 Applied move: ${move}`);
-      console.log(`🔍 Current state: ${workingState.toString()}`);
       const newPath = [...path, move];
-      
       // Log the current move being tested
       if (logger) {
         logger.debug(`🔍 Phase 1 testing move: ${move} (path: [${newPath.join(', ')}])`, false);
       }
-      
+      applyMove(workingState, move);
+
       const solution = await this.searchPhase1(workingState, depth - 1, newPath, logger);
       if (solution.length > 0) {
-        return [move, ...solution];
+        return solution;
       }
 
-      // Wait 0.5 seconds between each move test
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Yield control to allow other requests to be processed
+      // Wait 0.001 seconds between each move test
       await new Promise(resolve => setImmediate(resolve));
     }
 
