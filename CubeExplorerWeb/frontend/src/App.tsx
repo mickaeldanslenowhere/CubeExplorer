@@ -14,6 +14,7 @@ import { ScrambleInput } from './components/ScrambleInput';
 import { useSolve } from './hooks/useSolve';
 import { ResultsPanel } from './components/ResultsPanel';
 import ColorButton from './components/ColorButton';
+import { Cube3DIsometric } from './components/Cube2D/CubeIsometric3D';
 
 
 
@@ -25,7 +26,7 @@ function AppContent() {
 
   // Function to determine if a cubie should be rendered for the L-shape
   // Based on the image: bottom layer + top layer + left column of middle layer
-  const isCubiePresent = (x: number, y: number, _z: number): boolean => { // eslint-disable-line @typescript-eslint/no-unused-vars
+  /* const isCubiePresent = (x: number, y: number, _z: number): boolean => { // eslint-disable-line @typescript-eslint/no-unused-vars
     // Bottom layer (y=0) - all 9 cubies
     if (y === 0) return true;
     
@@ -36,7 +37,7 @@ function AppContent() {
     if (y === 1 && x === 0) return true;
     
     return false;
-  };
+  }; */
 
   // Helper function to get the color for a specific facelet in 3D
   const getFaceColorFor3D = (state: Record<string, string[]>, faceName: string, x: number, y: number, z: number) => {
@@ -134,21 +135,12 @@ function AppContent() {
     );
   };
 
-  // 3D Cube component for isometric view (L-shape from image)
-  const Cube3DIsometric = () => {
-    return (
-      <group rotation={[Math.PI / 6, Math.PI / 4, 0]}> {/* Better isometric rotation */}
-        <RubiksCube3x3Base cubeStateFor3D={cubeState} filterCubies={isCubiePresent} />
-      </group>
-    );
-  };
-
   // 3x3x3 Rubik's Cube component for rotating view
-  const RubiksCube3x3 = ({ cubeState }: { cubeState: Record<string, string[]> }) => {
+  /* const RubiksCube3x3 = ({ cubeState }: { cubeState: Record<string, string[]> }) => {
     return (
       <RubiksCube3x3Base cubeStateFor3D={cubeState} />
     );
-  };
+  };*/
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-2">
@@ -166,7 +158,7 @@ function AppContent() {
             </div>
 
             {/* Color Selector - Overlay on the right */}
-            <div className="absolute right-2 top-2 bg-white border border-gray-300 rounded p-2 shadow-sm">
+            <div className="absolute right-2 top-2 bg-white border border-gray-300 rounded p-3 shadow-sm">
               <div className="text-xs font-semibold text-gray-700 mb-2 text-center">Colors</div>
               <div className="flex flex-col space-y-1">
                 {colors.map((color) => (
@@ -180,8 +172,8 @@ function AppContent() {
               </div>
             </div>
 
-            {/* Reset To - Overlay on the bottom right */}
-            <div className="absolute right-2 bottom-2 bg-white border border-gray-300 rounded p-2 shadow-sm">
+            {/* Reset To - Overlay on the bottom left */}
+            <div className="absolute left-2 bottom-2 bg-white border border-gray-300 rounded p-2 shadow-sm">
               <div className="text-xs font-semibold text-gray-700 mb-2 text-center">Reset To</div>
               <div className="grid grid-cols-3 gap-1">
                 <ControlButton label="Empty" onClick={() => {/* TODO: Implement empty cube */}} />
@@ -194,18 +186,15 @@ function AppContent() {
             )}
 
             {viewMode === '3d-isometric' && (
-              <Canvas camera={{ position: [0, 0, 5], fov: 75 }}>
-                <ambientLight intensity={0.5} />
-                <pointLight position={[10, 10, 10]} />
-                <Cube3DIsometric />
-              </Canvas>
+              <Cube3DIsometric />
             )}
 
             {viewMode === '3d-rotating' && (
               <Canvas camera={{ position: [0, 0, 5], fov: 75 }}>
                 <ambientLight intensity={0.5} />
                 <pointLight position={[10, 10, 10]} />
-                <RubiksCube3x3 cubeState={cubeState} />
+                {/* <RubiksCube3x3 cubeState={cubeState} /> */}
+                Not implemented
                 <OrbitControls />
               </Canvas>
             )}

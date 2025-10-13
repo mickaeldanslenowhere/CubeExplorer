@@ -1,21 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useColorScheme } from '../hooks/useColorScheme';
 import { CubeContext } from './CubeContextDefinition';
-import type { Color } from '../hooks/useColors';
+import CubeState from '@cube-explorer/shared/src/cube/CubeState';
 
 export const CubeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { getColorScheme } = useColorScheme();
 
-  const defaultCubeState = {
-    up: Array(9).fill(getColorScheme().UColor),
-    front: Array(9).fill(getColorScheme().FColor),
-    left: Array(9).fill(getColorScheme().LColor),
-    right: Array(9).fill(getColorScheme().RColor),
-    back: Array(9).fill(getColorScheme().BColor),
-    down: Array(9).fill(getColorScheme().DColor)
-  };
-
-  const [cubeState, setCubeState] = useState<Record<string, Color[]>>(defaultCubeState);
+  const [cubeState, setCubeState] = useState<CubeState>(new CubeState());
 
   // Log cubeState changes
   useEffect(() => {
@@ -23,7 +12,7 @@ export const CubeProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [cubeState]);
 
   return (
-    <CubeContext.Provider value={{ cubeState, setCubeState, defaultCubeState }}>
+    <CubeContext.Provider value={{ cubeState, setCubeState, defaultCubeState: new CubeState() }}>
       {children}
     </CubeContext.Provider>
   );

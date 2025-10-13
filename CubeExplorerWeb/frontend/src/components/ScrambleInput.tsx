@@ -1,11 +1,20 @@
 import { useState } from 'react';
-import { useScramble } from '../hooks/useScramble';
 import { useScrambleContext } from '../contexts/ScrambleContext';
+import { applyScramble, isValidScramble } from '@cube-explorer/shared';
+import { useCubeContext } from '../hooks/useContexts';
 
 export const ScrambleInput = () => {
   const { scrambleText, setScrambleText, clearScramble } = useScrambleContext();
   const [isGenerating, setIsGenerating] = useState(false);
-  const { applyScramble, isValidScramble } = useScramble();
+
+
+  const { cubeState, setCubeState } = useCubeContext();
+
+
+  const handleApplyScramble = (scramble: string) => {
+    applyScramble(cubeState, scramble);
+    setCubeState(cubeState);
+  };
 
   const handleGenerateScramble = async () => {
     setIsGenerating(true);
@@ -28,14 +37,14 @@ export const ScrambleInput = () => {
       setScrambleText(generatedScramble);
       
       // Apply the scramble automatically with reset
-      applyScramble(generatedScramble);
+      handleApplyScramble(generatedScramble);
       
     } catch (error) {
       console.error('Error generating scramble:', error);
       // Fallback to a simple scramble
       const fallbackScramble = 'R U R';
       setScrambleText(fallbackScramble);
-      applyScramble(fallbackScramble);
+      handleApplyScramble(fallbackScramble);
     } finally {
       setIsGenerating(false);
     }
@@ -70,7 +79,7 @@ export const ScrambleInput = () => {
           {isGenerating ? 'Generating...' : 'Generate'}
         </button>
         <button
-          onClick={() => applyScramble(scrambleText)}
+          onClick={() => handleApplyScramble(scrambleText)}
           disabled={!isScrambleValid}
           className={`px-3 py-1 text-xs rounded transition-colors ${
             isScrambleValid

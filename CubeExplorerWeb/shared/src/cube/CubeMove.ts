@@ -153,4 +153,6 @@ export {
     chooseMoveMatrix,
     applyScramble,
     allValidMoves,
+    isValidScramble,
+    parseScramble,
 }

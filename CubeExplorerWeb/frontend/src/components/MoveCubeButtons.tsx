@@ -1,14 +1,15 @@
-import useCubeMoves from "../hooks/useCubeMoves"
-import { cubeRotations } from "../hooks/useCubeMoves"
 import ControlButton from "./ControlButton"
 import { useScrambleContext } from "../contexts/ScrambleContext"
+import { applyMove, cubeRotations } from "@cube-explorer/shared";
+import { useCubeContext } from "../hooks/useContexts";
 
 export const MoveCubeButtons = () => {
-    const { applyMove } = useCubeMoves();
+    const { cubeState, setCubeState } = useCubeContext();
     const { appendToScramble } = useScrambleContext();
 
     const handleMove = (move: string) => {
-        applyMove(move);
+        applyMove(cubeState, move);
+        setCubeState(cubeState)
         appendToScramble(move);
     };
     return (

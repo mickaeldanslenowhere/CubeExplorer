@@ -1,24 +1,16 @@
-export const Colors = {
-    WHITE: 'white',
-    YELLOW: 'yellow',   
-    RED: 'red',
-    ORANGE: 'orange',
-    GREEN: 'green',
-    BLUE: 'blue'
-} as const;
+import { type CubeFacet, CubeFacets } from "@cube-explorer/shared/src/cube/CubeFacet";
 
-export type Color = typeof Colors[keyof typeof Colors];
-
-export const colors: { name: string, value: Color, bg: string }[] = [
-    { name: 'White', value: Colors.WHITE, bg: 'bg-white' },
-    { name: 'Yellow', value: Colors.YELLOW, bg: 'bg-yellow-400' },
-    { name: 'Red', value: Colors.RED, bg: 'bg-red-500' },
-    { name: 'Orange', value: Colors.ORANGE, bg: 'bg-orange-500' },
-    { name: 'Green', value: Colors.GREEN, bg: 'bg-green-500' },
-    { name: 'Blue', value: Colors.BLUE, bg: 'bg-blue-500' }
+export const colors: { name: string, value: CubeFacet, bg: string }[] = [
+    { name: 'White', value: CubeFacets.WHITE, bg: 'bg-white' },
+    { name: 'Yellow', value: CubeFacets.YELLOW, bg: 'bg-yellow-400' },
+    { name: 'Red', value: CubeFacets.RED, bg: 'bg-red-500' },
+    { name: 'Orange', value: CubeFacets.ORANGE, bg: 'bg-orange-500' },
+    { name: 'Green', value: CubeFacets.GREEN, bg: 'bg-green-500' },
+    { name: 'Blue', value: CubeFacets.BLUE, bg: 'bg-blue-500' },
+    { name: 'X_Wildcard', value: CubeFacets.X_WILDCARD, bg: 'bg-gray-400' }
 ];
 
-export function getColor(color: Color) {
+export function getColor(color: CubeFacet) {
     const colorValue = colors.find(c => c.value === color)
     if (!colorValue) {
         throw new Error(`Color ${color} not found`);

@@ -28,40 +28,9 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = ({
     return new Date(timestamp).toLocaleTimeString();
   };
 
-  const cubeStateToString = (state: typeof cubeState) => {
-    const faces = ['up', 'front', 'down', 'back', 'left', 'right'] as const;
-    let result = '';
-    
-    for (const face of faces) {
-      const firstLetters = state[face].map(color => color.charAt(0).toUpperCase());
-      result += `${face.toUpperCase()}: [${firstLetters.join(' ')}] `;
-    }
-    
-    return result.trim();
-  };
-
-  const cubeStateToDetailedString = (state: typeof cubeState) => {
-    const faces = ['up', 'front', 'down', 'back', 'left', 'right'] as const;
-    let result = '';
-    
-    for (const face of faces) {
-      result += `${face.toUpperCase()}:\n`;
-      const faceArray = state[face];
-      for (let i = 0; i < 9; i += 3) {
-        const row = [faceArray[i], faceArray[i + 1], faceArray[i + 2]]
-          .map(color => color.charAt(0).toUpperCase())
-          .join(' ');
-        result += `  ${row}\n`;
-      }
-      result += '\n';
-    }
-    
-    return result;
-  };
-
   const copyCubeStateToClipboard = async () => {
     try {
-      await navigator.clipboard.writeText(cubeStateToString(cubeState));
+      await navigator.clipboard.writeText(cubeState.toString());
       // You could add a toast notification here if you have one
     } catch (err) {
       console.error('Failed to copy cube state:', err);
@@ -83,16 +52,8 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = ({
           </button>
         </div>
         <div className="text-xs text-gray-600 font-mono bg-gray-50 p-2 rounded border">
-          {cubeStateToString(cubeState)}
+          {cubeState.toString()}
         </div>
-        <details className="mt-2">
-          <summary className="text-xs text-gray-500 cursor-pointer hover:text-gray-700">
-            Show detailed view
-          </summary>
-          <div className="mt-2 text-xs text-gray-600 font-mono bg-gray-50 p-2 rounded border whitespace-pre-line">
-            {cubeStateToDetailedString(cubeState)}
-          </div>
-        </details>
       </div>
 
       {isSolving && (

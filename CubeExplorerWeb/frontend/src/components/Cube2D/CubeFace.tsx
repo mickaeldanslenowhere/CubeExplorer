@@ -10,7 +10,7 @@ export const CubeFace = ({ face }: CubeFaceProps) => {
     const { selectedColor, setSelectedColor } = useColorContext();
     return (
         <div className="grid grid-cols-3 border border-gray-600">
-            {cubeState[face].map((color, index) => (
+            {cubeState.getCubeState()[face].map((color, index) => (
                 <div
                     key={index}
                     className={`w-6 h-6 border border-gray-600 cursor-pointer ${getColor(color).bg}`}
@@ -21,9 +21,12 @@ export const CubeFace = ({ face }: CubeFaceProps) => {
                           console.log(`Selected color from center facelet: ${color}`);
                         } else {
                           // Otherwise, change the facelet's color
-                          const newColors = [...cubeState[face]];
+                          const newColors = [...cubeState.getCubeState()[face]];
                           newColors[index] = selectedColor;
-                          setCubeState({...cubeState, [face]: newColors});
+                          const newCubeState = cubeState.getDeepCopy();
+                          newCubeState[face] = newColors;
+                          cubeState.setCubeState(newCubeState);
+                          setCubeState(cubeState.clone());
                           console.log(`Updated ${face} face at position ${index} to ${selectedColor}`);
                         }
                       }}

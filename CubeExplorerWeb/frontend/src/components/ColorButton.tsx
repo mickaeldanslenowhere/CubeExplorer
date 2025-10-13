@@ -1,8 +1,8 @@
 import { getColor } from "../hooks/useColors";
-import type { Color } from "../hooks/useColors";
+import type { CubeFacet } from "@cube-explorer/shared/src/cube/CubeFacet";
 
 type ColorButtonProps = {
-    color: Color;
+    color: CubeFacet;
     onClick: () => void;
     isSelected?: boolean;
 }

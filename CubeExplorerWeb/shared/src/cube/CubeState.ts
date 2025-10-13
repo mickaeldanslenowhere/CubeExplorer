@@ -1,4 +1,4 @@
-import { CubeFacet } from "./CubeFacet";
+import { CubeFacet, CubeFacets } from "./CubeFacet";
 
 type CubeStateType = {
   up: CubeFacet[];
@@ -10,12 +10,12 @@ type CubeStateType = {
 }
 
 const defaultCubeState: CubeStateType = {
-  up: [CubeFacet.WHITE, CubeFacet.WHITE, CubeFacet.WHITE, CubeFacet.WHITE, CubeFacet.WHITE, CubeFacet.WHITE, CubeFacet.WHITE, CubeFacet.WHITE, CubeFacet.WHITE],
-  front: [CubeFacet.GREEN, CubeFacet.GREEN, CubeFacet.GREEN, CubeFacet.GREEN, CubeFacet.GREEN, CubeFacet.GREEN, CubeFacet.GREEN, CubeFacet.GREEN, CubeFacet.GREEN],
-  down: [CubeFacet.YELLOW, CubeFacet.YELLOW, CubeFacet.YELLOW, CubeFacet.YELLOW, CubeFacet.YELLOW, CubeFacet.YELLOW, CubeFacet.YELLOW, CubeFacet.YELLOW, CubeFacet.YELLOW],
-  back: [CubeFacet.BLUE, CubeFacet.BLUE, CubeFacet.BLUE, CubeFacet.BLUE, CubeFacet.BLUE, CubeFacet.BLUE, CubeFacet.BLUE, CubeFacet.BLUE, CubeFacet.BLUE],
-  left: [CubeFacet.ORANGE, CubeFacet.ORANGE, CubeFacet.ORANGE, CubeFacet.ORANGE, CubeFacet.ORANGE, CubeFacet.ORANGE, CubeFacet.ORANGE, CubeFacet.ORANGE, CubeFacet.ORANGE],
-  right: [CubeFacet.RED, CubeFacet.RED, CubeFacet.RED, CubeFacet.RED, CubeFacet.RED, CubeFacet.RED, CubeFacet.RED, CubeFacet.RED, CubeFacet.RED]
+  up: [CubeFacets.WHITE, CubeFacets.WHITE, CubeFacets.WHITE, CubeFacets.WHITE, CubeFacets.WHITE, CubeFacets.WHITE, CubeFacets.WHITE, CubeFacets.WHITE, CubeFacets.WHITE],
+  front: [CubeFacets.GREEN, CubeFacets.GREEN, CubeFacets.GREEN, CubeFacets.GREEN, CubeFacets.GREEN, CubeFacets.GREEN, CubeFacets.GREEN, CubeFacets.GREEN, CubeFacets.GREEN],
+  down: [CubeFacets.YELLOW, CubeFacets.YELLOW, CubeFacets.YELLOW, CubeFacets.YELLOW, CubeFacets.YELLOW, CubeFacets.YELLOW, CubeFacets.YELLOW, CubeFacets.YELLOW, CubeFacets.YELLOW],
+  back: [CubeFacets.BLUE, CubeFacets.BLUE, CubeFacets.BLUE, CubeFacets.BLUE, CubeFacets.BLUE, CubeFacets.BLUE, CubeFacets.BLUE, CubeFacets.BLUE, CubeFacets.BLUE],
+  left: [CubeFacets.ORANGE, CubeFacets.ORANGE, CubeFacets.ORANGE, CubeFacets.ORANGE, CubeFacets.ORANGE, CubeFacets.ORANGE, CubeFacets.ORANGE, CubeFacets.ORANGE, CubeFacets.ORANGE],
+  right: [CubeFacets.RED, CubeFacets.RED, CubeFacets.RED, CubeFacets.RED, CubeFacets.RED, CubeFacets.RED, CubeFacets.RED, CubeFacets.RED, CubeFacets.RED]
 }
 
 export default class CubeState {
@@ -63,12 +63,13 @@ export default class CubeState {
   };
 
   isSolved() {
-    return this.cubeState.up.every(color => color === CubeFacet.WHITE) &&
-      this.cubeState.front.every(color => color === CubeFacet.GREEN) &&
-      this.cubeState.down.every(color => color === CubeFacet.YELLOW) &&
-      this.cubeState.back.every(color => color === CubeFacet.BLUE) &&
-      this.cubeState.left.every(color => color === CubeFacet.ORANGE) &&
-      this.cubeState.right.every(color => color === CubeFacet.RED);
+    for (const face of Object.keys(this.cubeState)) {
+      const centerColor = this.cubeState[face as keyof CubeStateType][4];
+      if (!this.cubeState[face as keyof CubeStateType].every(color => color === centerColor)) {
+        return false;
+      }
+    }
+    return true;
   }
 }
 
