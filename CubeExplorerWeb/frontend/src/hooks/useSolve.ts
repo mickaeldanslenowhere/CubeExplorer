@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { useScrambleContext } from '../contexts/ScrambleContext';
+import { useCubeContext } from './useContexts';
 
 interface SolveResult {
   resolution: string;
@@ -12,7 +12,7 @@ export const useSolve = () => {
   const [results, setResults] = useState<SolveResult[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [realTimeLogs, setRealTimeLogs] = useState<string[]>([]);
-  const { scrambleText } = useScrambleContext();
+  const { cubeState } = useCubeContext();
   const abortControllerRef = useRef<AbortController | null>(null);
 
   const solveCube = async () => {
@@ -21,12 +21,15 @@ export const useSolve = () => {
     setRealTimeLogs([]);
 
     try {
-      if (!scrambleText.trim()) {
-        throw new Error('No scramble provided');
+      if (!cubeState) {
+        throw new Error('No cube state provided');
       }
       
+      // Convert cubeState to string for the API
+      const cubeStateString = JSON.stringify(cubeState.getCubeState());
+      
       // Use Server-Sent Events for real-time logs
-      const eventSource = new EventSource(`http://localhost:3001/api/solve?scramble=${encodeURIComponent(scrambleText)}`);
+      const eventSource = new EventSource(`http://localhost:3001/api/solve?cubeState=${encodeURIComponent(cubeStateString)}`);
       
       const logs: string[] = [];
       let resolution = '';

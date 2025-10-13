@@ -1,15 +1,15 @@
-import { Colors } from "./useColors";
+import { CubeFacets } from "@cube-explorer/shared/src/cube/CubeFacet";
 
 export function useColorScheme() {
 
     const getColorScheme = () => {
         return {
-            UColor: Colors.WHITE,
-            RColor: Colors.RED,
-            FColor: Colors.GREEN,
-            DColor: Colors.YELLOW,
-            LColor: Colors.ORANGE,
-            BColor: Colors.BLUE
+            UColor: CubeFacets.WHITE,
+            RColor: CubeFacets.RED,
+            FColor: CubeFacets.GREEN,
+            DColor: CubeFacets.YELLOW,
+            LColor: CubeFacets.ORANGE,
+            BColor: CubeFacets.BLUE
         }
     }
 

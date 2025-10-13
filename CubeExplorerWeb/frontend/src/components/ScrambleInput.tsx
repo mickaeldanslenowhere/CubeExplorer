@@ -1,12 +1,11 @@
 import { useState } from 'react';
-import { useScrambleContext } from '../contexts/ScrambleContext';
+import { useScrambleContext } from '../hooks/useScrambleContext';
 import { applyScramble, isValidScramble } from '@cube-explorer/shared';
 import { useCubeContext } from '../hooks/useContexts';
 
 export const ScrambleInput = () => {
-  const { scrambleText, setScrambleText, clearScramble } = useScrambleContext();
+  const { scrambleText, setScrambleText, clearScramble, isInputInvalid, setInputInvalid } = useScrambleContext();
   const [isGenerating, setIsGenerating] = useState(false);
-
 
   const { cubeState, setCubeState } = useCubeContext();
 
@@ -14,6 +13,7 @@ export const ScrambleInput = () => {
   const handleApplyScramble = (scramble: string) => {
     applyScramble(cubeState, scramble);
     setCubeState(cubeState);
+    setInputInvalid(false); // Reset invalid state when applying a scramble
   };
 
   const handleGenerateScramble = async () => {
@@ -50,7 +50,7 @@ export const ScrambleInput = () => {
     }
   };
 
-  const isScrambleValid = isValidScramble(scrambleText);
+  const isScrambleValid = isValidScramble(scrambleText) && !isInputInvalid;
 
   return (
     <div className="border border-gray-400 rounded p-3 mb-4">
@@ -60,11 +60,14 @@ export const ScrambleInput = () => {
           type="text"
           value={scrambleText}
           onChange={(e) => setScrambleText(e.target.value)}
-          placeholder="Enter moves (e.g., R U F' D L' B)"
+          placeholder={isInputInvalid ? "Cube modified manually - click 'Clean' to reset" : "Enter moves (e.g., R U F' D L' B)"}
+          disabled={isInputInvalid}
           className={`flex-1 px-2 py-1 text-xs border rounded ${
-            scrambleText && !isScrambleValid 
-              ? 'border-red-500 bg-red-50' 
-              : 'border-gray-400'
+            isInputInvalid
+              ? 'border-orange-500 bg-orange-50 text-gray-500 cursor-not-allowed'
+              : scrambleText && !isScrambleValid 
+                ? 'border-red-500 bg-red-50' 
+                : 'border-gray-400'
           }`}
         />
         <button
@@ -80,9 +83,9 @@ export const ScrambleInput = () => {
         </button>
         <button
           onClick={() => handleApplyScramble(scrambleText)}
-          disabled={!isScrambleValid}
+          disabled={!isScrambleValid || isInputInvalid}
           className={`px-3 py-1 text-xs rounded transition-colors ${
-            isScrambleValid
+            isScrambleValid && !isInputInvalid
               ? 'bg-blue-600 text-white hover:bg-blue-700'
               : 'bg-gray-300 text-gray-500 cursor-not-allowed'
           }`}
@@ -101,7 +104,12 @@ export const ScrambleInput = () => {
           Clear
         </button>
       </div>
-      {scrambleText && !isScrambleValid && (
+      {isInputInvalid && (
+        <div className="text-xs text-orange-600 mt-1">
+          ⚠️ Cube has been modified manually. Click "Clean" to reset and enable scramble input.
+        </div>
+      )}
+      {scrambleText && !isScrambleValid && !isInputInvalid && (
         <div className="text-xs text-red-600 mt-1">
           Invalid moves detected. Valid moves: R, U, F, D, L, B, R', U', F', D', L', B', R2, U2, F2, D2, L2, B2, E, S, M, E', S', M', E2, S2, M2, x, y, z, x', y', z', x2, y2, z2
         </div>

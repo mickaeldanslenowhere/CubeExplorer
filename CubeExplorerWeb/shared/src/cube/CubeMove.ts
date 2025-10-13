@@ -1,6 +1,6 @@
-import CubeState, { CubeStateType } from './CubeState';
+import CubeState, { type CubeStateType } from './CubeState';
 import * as matrixes from './matrixes';
-import { MoveMatrix } from './matrixes/MoveMatrix';
+import { type MoveMatrix } from './matrixes/MoveMatrix';
 
 export const CubeMoves = {
     R: 'R',

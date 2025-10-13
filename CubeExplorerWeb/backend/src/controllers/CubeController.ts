@@ -56,21 +56,29 @@ export class CubeController {
     CancellationManager.reset();
     
     try {
-      let { scramble } = req.body;
-      if (!scramble) {
-        scramble = req.query.scramble as string;
-      }
-      Logger.log(`📝 [API] Scramble received: "${scramble}"`);
+      let cubeStateString = req.query.cubeState as string;
+      Logger.log(`📝 [API] CubeState received: "${cubeStateString}"`);
       
-      if (!scramble) {
-        Logger.error('❌ [API] No scramble provided');
-        res.status(400).json({ error: 'Scramble string is required' });
+      if (!cubeStateString) {
+        Logger.error('❌ [API] No cubeState provided');
+        res.status(400).json({ error: 'CubeState is required' });
         return;
       }
 
-      if (typeof scramble !== 'string') {
-        Logger.error('❌ [API] Scramble is not a string');
-        res.status(400).json({ error: 'Scramble must be a string' });
+      if (typeof cubeStateString !== 'string') {
+        Logger.error('❌ [API] CubeState is not a string');
+        res.status(400).json({ error: 'CubeState must be a string' });
+        return;
+      }
+
+      // Parse the cubeState string
+      let cubeState;
+      try {
+        cubeState = JSON.parse(cubeStateString);
+        Logger.log(`📦 [API] CubeState parsed successfully`);
+      } catch (parseError) {
+        Logger.error('❌ [API] Failed to parse cubeState JSON');
+        res.status(400).json({ error: 'Invalid cubeState JSON format' });
         return;
       }
 
@@ -105,7 +113,7 @@ export class CubeController {
       Logger.log('🚀 [API] Calling SolveService.solveCubeWithLogs with real-time logs...');
       
       // Call the service with real-time logging
-      const result = await SolveService.solveCubeWithLogs(scramble);
+      const result = await SolveService.solveCubeWithLogs(cubeState);
       
       const totalTime = Date.now() - startTime;
       Logger.log(`✅ [API] Solve request completed in ${totalTime}ms`);

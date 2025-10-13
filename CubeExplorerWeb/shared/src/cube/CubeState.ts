@@ -1,4 +1,4 @@
-import { CubeFacet, CubeFacets } from "./CubeFacet";
+import { type CubeFacet, CubeFacets } from "./CubeFacet";
 
 type CubeStateType = {
   up: CubeFacet[];
@@ -73,7 +73,9 @@ export default class CubeState {
   }
 }
 
-export {
+export type {
   CubeStateType,
+};
+export {
   defaultCubeState,
 };

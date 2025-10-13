@@ -1,13 +1,5 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-
-interface ScrambleContextType {
-  scrambleText: string;
-  setScrambleText: (text: string) => void;
-  appendToScramble: (move: string) => void;
-  clearScramble: () => void;
-}
-
-const ScrambleContext = createContext<ScrambleContextType | undefined>(undefined);
+import React, { useState, type ReactNode } from 'react';
+import { ScrambleContext } from './ScrambleContextDefinition';
 
 interface ScrambleProviderProps {
   children: ReactNode;
@@ -15,6 +7,7 @@ interface ScrambleProviderProps {
 
 export const ScrambleProvider: React.FC<ScrambleProviderProps> = ({ children }) => {
   const [scrambleText, setScrambleText] = useState('');
+  const [isInputInvalid, setIsInputInvalid] = useState(false);
 
   const appendToScramble = (move: string) => {
     setScrambleText(prev => {
@@ -27,6 +20,7 @@ export const ScrambleProvider: React.FC<ScrambleProviderProps> = ({ children }) 
 
   const clearScramble = () => {
     setScrambleText('');
+    setIsInputInvalid(false);
   };
 
   return (
@@ -34,17 +28,12 @@ export const ScrambleProvider: React.FC<ScrambleProviderProps> = ({ children }) 
       scrambleText,
       setScrambleText,
       appendToScramble,
-      clearScramble
+      clearScramble,
+      isInputInvalid,
+      setInputInvalid: setIsInputInvalid
     }}>
       {children}
     </ScrambleContext.Provider>
   );
 };
 
-export const useScrambleContext = () => {
-  const context = useContext(ScrambleContext);
-  if (context === undefined) {
-    throw new Error('useScrambleContext must be used within a ScrambleProvider');
-  }
-  return context;
-};

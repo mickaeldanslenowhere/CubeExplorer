@@ -1,5 +1,6 @@
 import { getColor } from "../../hooks/useColors";
 import { useCubeContext, useColorContext } from "../../hooks/useContexts";
+import { useScrambleContext } from "../../hooks/useScrambleContext";
 
 type CubeFaceProps = {
     face: "up" | "down" | "front" | "back" | "left" | "right";
@@ -8,6 +9,7 @@ type CubeFaceProps = {
 export const CubeFace = ({ face }: CubeFaceProps) => {
     const { cubeState, setCubeState } = useCubeContext();
     const { selectedColor, setSelectedColor } = useColorContext();
+    const { setInputInvalid } = useScrambleContext();
     return (
         <div className="grid grid-cols-3 border border-gray-600">
             {cubeState.getCubeState()[face].map((color, index) => (
@@ -27,6 +29,7 @@ export const CubeFace = ({ face }: CubeFaceProps) => {
                           newCubeState[face] = newColors;
                           cubeState.setCubeState(newCubeState);
                           setCubeState(cubeState.clone());
+                          setInputInvalid(true); // Mark input as invalid when cube is modified manually
                           console.log(`Updated ${face} face at position ${index} to ${selectedColor}`);
                         }
                       }}

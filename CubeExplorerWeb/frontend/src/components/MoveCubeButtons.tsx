@@ -1,5 +1,5 @@
 import ControlButton from "./ControlButton"
-import { useScrambleContext } from "../contexts/ScrambleContext"
+import { useScrambleContext } from "../hooks/useScrambleContext"
 import { applyMove, cubeRotations } from "@cube-explorer/shared";
 import { useCubeContext } from "../hooks/useContexts";
 

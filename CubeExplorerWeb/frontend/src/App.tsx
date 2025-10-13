@@ -1,5 +1,5 @@
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Box } from '@react-three/drei';
+import { OrbitControls } from '@react-three/drei';
 import { colors } from './hooks/useColors';
 import ControlButton from './components/ControlButton';
 import useViewMode from './hooks/useViewMode';
@@ -8,6 +8,7 @@ import { MoveCubeButtons } from './components/MoveCubeButtons';
 import { CubeProvider } from './contexts/CubeContext';
 import { ColorProvider } from './contexts/ColorContext';
 import { ScrambleProvider } from './contexts/ScrambleContext';
+import { useScrambleContext } from './hooks/useScrambleContext';
 import { useCubeContext, useColorContext } from './hooks/useContexts';
 import { Cube2D } from './components/Cube2D/Cube2D';
 import { ScrambleInput } from './components/ScrambleInput';
@@ -20,7 +21,8 @@ import { Cube3DIsometric } from './components/Cube2D/CubeIsometric3D';
 
 function AppContent() {
   const { selectedColor, setSelectedColor } = useColorContext();
-  const { defaultCubeState, cubeState, setCubeState } = useCubeContext();
+  const { defaultCubeState, setCubeState } = useCubeContext();
+  const { setInputInvalid } = useScrambleContext();
   const { viewMode, setViewMode } = useViewMode();
   const { solveCube, cancelSolve, clearResults, isSolving, results, error, realTimeLogs } = useSolve();
 
@@ -39,101 +41,7 @@ function AppContent() {
     return false;
   }; */
 
-  // Helper function to get the color for a specific facelet in 3D
-  const getFaceColorFor3D = (state: Record<string, string[]>, faceName: string, x: number, y: number, z: number) => {
-    let index: number;
-    switch (faceName) {
-      case 'up':
-        index = x + (2 - z) * 3;
-        break;
-      case 'down':
-        index = x + z * 3;
-        break;
-      case 'front':
-        index = x + (2 - y) * 3;
-        break;
-      case 'back':
-        index = (2 - x) + (2 - y) * 3;
-        break;
-      case 'left':
-        index = z + (2 - y) * 3;
-        break;
-      case 'right':
-        index = (2 - z) + (2 - y) * 3;
-        break;
-      default:
-        return 'black';
-    }
-    return state[faceName][index] || 'black';
-  };
 
-  // Base 3x3x3 Rubik's Cube component (reusable for both 3D views)
-  const RubiksCube3x3Base = ({ cubeStateFor3D, filterCubies = () => true }: { cubeStateFor3D: Record<string, string[]>, filterCubies?: (x: number, y: number, z: number) => boolean }) => {
-    const cubeSize = 0.3;
-    const spacing = 0.32;
-    const offset = -spacing;
-
-    return (
-      <group>
-        {Array.from({ length: 3 }, (_, x) =>
-          Array.from({ length: 3 }, (_, y) =>
-            Array.from({ length: 3 }, (_, z) => {
-              if (!filterCubies(x, y, z)) return null;
-
-              const cubeX = x * spacing + offset;
-              const cubeY = y * spacing + offset;
-              const cubeZ = z * spacing + offset;
-
-              return (
-                <group key={`${x}-${y}-${z}`} position={[cubeX, cubeY, cubeZ]}>
-                  {/* Front face (z = 2) */}
-                  {z === 2 && (
-                    <Box position={[0, 0, cubeSize/2 + 0.01]} args={[cubeSize, cubeSize, 0.01]}>
-                      <meshStandardMaterial color={getFaceColorFor3D(cubeStateFor3D, 'front', x, y, z)} />
-                    </Box>
-                  )}
-                  {/* Back face (z = 0) */}
-                  {z === 0 && (
-                    <Box position={[0, 0, -cubeSize/2 - 0.01]} args={[cubeSize, cubeSize, 0.01]}>
-                      <meshStandardMaterial color={getFaceColorFor3D(cubeStateFor3D, 'back', x, y, z)} />
-                    </Box>
-                  )}
-                  {/* Left face (x = 0) */}
-                  {x === 0 && (
-                    <Box position={[-cubeSize/2 - 0.01, 0, 0]} args={[0.01, cubeSize, cubeSize]}>
-                      <meshStandardMaterial color={getFaceColorFor3D(cubeStateFor3D, 'left', x, y, z)} />
-                    </Box>
-                  )}
-                  {/* Right face (x = 2) */}
-                  {x === 2 && (
-                    <Box position={[cubeSize/2 + 0.01, 0, 0]} args={[0.01, cubeSize, cubeSize]}>
-                      <meshStandardMaterial color={getFaceColorFor3D(cubeStateFor3D, 'right', x, y, z)} />
-                    </Box>
-                  )}
-                  {/* Up face (y = 2) */}
-                  {y === 2 && (
-                    <Box position={[0, cubeSize/2 + 0.01, 0]} args={[cubeSize, 0.01, cubeSize]}>
-                      <meshStandardMaterial color={getFaceColorFor3D(cubeStateFor3D, 'up', x, y, z)} />
-                    </Box>
-                  )}
-                  {/* Down face (y = 0) */}
-                  {y === 0 && (
-                    <Box position={[0, -cubeSize/2 - 0.01, 0]} args={[cubeSize, 0.01, cubeSize]}>
-                      <meshStandardMaterial color={getFaceColorFor3D(cubeStateFor3D, 'down', x, y, z)} />
-                    </Box>
-                  )}
-                  {/* Core cube (always black) */}
-                  <Box args={[cubeSize, cubeSize, cubeSize]}>
-                    <meshStandardMaterial color="#333333" />
-                  </Box>
-                </group>
-              );
-            })
-          )
-        )}
-      </group>
-    );
-  };
 
   // 3x3x3 Rubik's Cube component for rotating view
   /* const RubiksCube3x3 = ({ cubeState }: { cubeState: Record<string, string[]> }) => {
@@ -177,10 +85,27 @@ function AppContent() {
               <div className="text-xs font-semibold text-gray-700 mb-2 text-center">Reset To</div>
               <div className="grid grid-cols-3 gap-1">
                 <ControlButton label="Empty" onClick={() => {/* TODO: Implement empty cube */}} />
-                <ControlButton label="Clean" onClick={() => setCubeState(defaultCubeState)} />
+                <ControlButton label="Clean" onClick={() => {
+                  setCubeState(defaultCubeState);
+                  setInputInvalid(false); // Reset invalid state when cleaning
+                }} />
                 <ControlButton label="Random" onClick={() => {/* TODO: Implement random cube */}} />
               </div>
             </div>
+
+            {/* Add and Generate - Overlay on the bottom right */}
+            <div className="absolute right-2 bottom-2">
+              <ControlButton 
+                label={isSolving ? "Solving..." : "Find solutions"} 
+                onClick={solveCube}
+                disabled={isSolving}
+                className={`px-3 py-1 text-sm rounded shadow-lg transition-all ${isSolving 
+                  ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
+                  : 'bg-green-600 text-white hover:bg-green-700 hover:shadow-xl'
+                }`}
+              />
+            </div>
+
             {viewMode === '2d' && (
               <Cube2D />
             )}
@@ -212,15 +137,6 @@ function AppContent() {
 
             {/* Solve Buttons */}
             <div className="flex justify-center space-x-3">
-              <ControlButton 
-                label={isSolving ? "Solving..." : "Add and Generate"} 
-                onClick={solveCube}
-                disabled={isSolving}
-                className={`px-6 py-2 ${isSolving 
-                  ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
-                  : 'bg-green-600 text-white hover:bg-green-700'
-                }`}
-              />
               {isSolving && (
                 <ControlButton 
                   label="Cancel" 
