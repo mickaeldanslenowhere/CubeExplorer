@@ -103,6 +103,7 @@ const applyMove = (cubeState: CubeState, move: CubeAllMove) => {
     }
     const newState = applyMoveMatrix(cubeState, moveMatrix);
     cubeState.setCubeState(newState);
+    return cubeState;
 }
 
 const parseScramble = (scramble: string): string[] => {

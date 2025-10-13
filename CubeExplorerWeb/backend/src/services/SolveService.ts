@@ -2,6 +2,7 @@ import { FinalTwoPhaseSolver } from './FinalTwoPhaseSolver';
 import { CancellationManager } from '../utils/CancellationManager';
 import { Logger } from '../utils/Logger';
 import CubeState from '@cube-explorer/shared/src/cube/CubeState';
+import { isValidCubeState } from '@cube-explorer/shared/src/cube/CubeValidation';
 
 export class SolveService {
 
@@ -24,7 +25,7 @@ export class SolveService {
       
       // Validate the cubeState
       const validationStartTime = Date.now();
-      if (!this.isValidCubeState(cubeState)) {
+      if (!isValidCubeState(cubeState)) {
         throw new Error('Invalid cubeState format');
       }
       const validationTime = Date.now() - validationStartTime;
@@ -87,26 +88,6 @@ export class SolveService {
     }
   }
 
-  /**
-   * Validate if a cubeState object is valid
-   * @param cubeState - The cubeState object to validate
-   * @returns Boolean indicating if the cubeState is valid
-   */
-  private static isValidCubeState(cubeState: any): boolean {
-    if (!cubeState || typeof cubeState !== 'object') {
-      return false;
-    }
-    
-    // Check if all required faces are present
-    const requiredFaces = ['up', 'front', 'down', 'back', 'left', 'right'];
-    for (const face of requiredFaces) {
-      if (!cubeState[face] || !Array.isArray(cubeState[face]) || cubeState[face].length !== 9) {
-        return false;
-      }
-    }
-    
-    return true;
-  }
 
 
 
