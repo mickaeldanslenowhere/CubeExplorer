@@ -1,12 +1,13 @@
+import type { CubeFace } from "@cube-explorer/shared/src/cube/CubeFace";
 import { getColor } from "../../hooks/useColors";
 import { useCubeContext, useColorContext } from "../../hooks/useContexts";
 import { useScrambleContext } from "../../hooks/useScrambleContext";
 
-type CubeFaceProps = {
-    face: "up" | "down" | "front" | "back" | "left" | "right";
+type Cube2DFaceProps = {
+    face: CubeFace;
 }
 
-export const CubeFace = ({ face }: CubeFaceProps) => {
+export const Cube2DFace = ({ face }: Cube2DFaceProps) => {
     const { cubeState, setCubeState } = useCubeContext();
     const { selectedColor, setSelectedColor } = useColorContext();
     const { setInputInvalid } = useScrambleContext();

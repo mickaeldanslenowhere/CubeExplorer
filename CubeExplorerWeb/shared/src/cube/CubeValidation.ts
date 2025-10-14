@@ -1,6 +1,7 @@
 import CubeState, { type CubeStateType } from './CubeState';
 import { CubeFacets } from './CubeFacet';
 import { applyMove, CubeRotations, cubeRotations } from './CubeMove';
+import { CubeFaces, cubeFaces } from './CubeFace';
 
 /**
  * Validates if a cubeState object is valid
@@ -16,8 +17,7 @@ export function isValidCubeState(cubeState: any): boolean {
   const colorCount: { [key: string]: number } = {};
   
   // Check if all required faces are present
-  const requiredFaces = ['up', 'front', 'down', 'back', 'left', 'right'];
-  for (const face of requiredFaces) {
+  for (const face of cubeFaces) {
     if (!cubeState[face] || !Array.isArray(cubeState[face]) || cubeState[face].length !== 9) {
       return false;
     }
@@ -39,12 +39,12 @@ export function isValidCubeState(cubeState: any): boolean {
 
 
 function areCentersInSamePosition(cubeState: CubeStateType, cubeStateToCheck: CubeStateType): boolean {
-  return cubeState.up[4] === cubeStateToCheck.up[4]
-  && cubeState.front[4] === cubeStateToCheck.front[4]
-  && cubeState.down[4] === cubeStateToCheck.down[4]
-  && cubeState.back[4] === cubeStateToCheck.back[4]
-  && cubeState.left[4] === cubeStateToCheck.left[4]
-  && cubeState.right[4] === cubeStateToCheck.right[4];
+  return cubeState[CubeFaces.UP][4] === cubeStateToCheck[CubeFaces.UP][4]
+  && cubeState[CubeFaces.FRONT][4] === cubeStateToCheck[CubeFaces.FRONT][4]
+  && cubeState[CubeFaces.DOWN][4] === cubeStateToCheck[CubeFaces.DOWN][4]
+  && cubeState[CubeFaces.BACK][4] === cubeStateToCheck[CubeFaces.BACK][4]
+  && cubeState[CubeFaces.LEFT][4] === cubeStateToCheck[CubeFaces.LEFT][4]
+  && cubeState[CubeFaces.RIGHT][4] === cubeStateToCheck[CubeFaces.RIGHT][4];
 }
 
 /**

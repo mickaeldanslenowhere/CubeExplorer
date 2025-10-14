@@ -1,4 +1,5 @@
-import { CubeFace } from "./CubeFace"
+import { CubeFaces } from "@cube-explorer/shared/src/cube/CubeFace"
+import { Cube2DFace } from "./Cube2DFace"
 
 export const Cube2D = () => {
     return (
@@ -8,7 +9,7 @@ export const Cube2D = () => {
                   <div></div>
                   <div className="flex justify-center">
                     <div className="transform rotate-0">
-                      <CubeFace face="up" />
+                      <Cube2DFace face={CubeFaces.UP} />
                     </div>
                   </div>
                   <div></div>
@@ -17,22 +18,22 @@ export const Cube2D = () => {
                   {/* Row 2: Left, Front, Right, Back */}
                   <div className="flex justify-center">
                     <div className="transform rotate-180">
-                      <CubeFace face="left" />
+                      <Cube2DFace face={CubeFaces.LEFT} />
                     </div>
                   </div>
                   <div className="flex justify-center">
                     <div className="transform rotate-0">
-                      <CubeFace face="front" />
+                      <Cube2DFace face={CubeFaces.FRONT} />
                     </div>
                   </div>
                   <div className="flex justify-center">
                     <div className="transform rotate-0">
-                      <CubeFace face="right" />
+                      <Cube2DFace face={CubeFaces.RIGHT} />
                     </div>
                   </div>
                   <div className="flex justify-center">
                     <div className="transform rotate-180">
-                      <CubeFace face="back" />
+                      <Cube2DFace face={CubeFaces.BACK} />
                     </div>
                   </div>
                   
@@ -40,7 +41,7 @@ export const Cube2D = () => {
                   <div></div>
                   <div className="flex justify-center">
                     <div className="transform rotate-0">
-                      <CubeFace face="down" />
+                      <Cube2DFace face={CubeFaces.DOWN} />
                     </div>
                   </div>
                   <div></div>
