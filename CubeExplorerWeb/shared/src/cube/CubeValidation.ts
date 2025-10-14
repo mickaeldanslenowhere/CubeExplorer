@@ -8,7 +8,7 @@ import { CubeFaces, cubeFaces } from './CubeFace';
  * @param cubeState - The cubeState object to validate
  * @returns Boolean indicating if the cubeState is valid
  */
-export function isValidCubeState(cubeState: any): boolean {
+export function isValidCubeState(cubeState: CubeStateType): boolean {
   if (!cubeState || typeof cubeState !== 'object') {
     return false;
   }
@@ -56,33 +56,32 @@ function areCentersInSamePosition(cubeState: CubeStateType, cubeStateToCheck: Cu
  * @param cubeState - The cubeState object to validate
  * @returns Boolean indicating if centers are in correct relative positions
  */
-function areCentersInCorrectRelativePositions(cubeState: CubeState): boolean {
-  const innerCubeState = cubeState.getCubeState();
+function areCentersInCorrectRelativePositions(cubeState: CubeStateType): boolean {
   // in order to check we will create a dedicated cubestate that we will rotate on the axes and check the centers
   const cubeStateToCheck = new CubeState();
 
-  return areCentersInSamePosition(innerCubeState, cubeStateToCheck.getCubeState()) || // U UP, F Front
-  (applyMove(cubeStateToCheck, CubeRotations.y) && areCentersInSamePosition(innerCubeState, cubeStateToCheck.getCubeState())) ||
-  (applyMove(cubeStateToCheck, CubeRotations.y) && areCentersInSamePosition(innerCubeState, cubeStateToCheck.getCubeState())) ||
-  (applyMove(cubeStateToCheck, CubeRotations.y) && areCentersInSamePosition(innerCubeState, cubeStateToCheck.getCubeState())) ||
-  (applyMove(cubeStateToCheck, CubeRotations.y) && applyMove(cubeStateToCheck, CubeRotations.x) && areCentersInSamePosition(innerCubeState, cubeStateToCheck.getCubeState())) || // F up, D front
-  (applyMove(cubeStateToCheck, CubeRotations.y) && areCentersInSamePosition(innerCubeState, cubeStateToCheck.getCubeState())) ||
-  (applyMove(cubeStateToCheck, CubeRotations.y) && areCentersInSamePosition(innerCubeState, cubeStateToCheck.getCubeState())) ||
-  (applyMove(cubeStateToCheck, CubeRotations.y) && areCentersInSamePosition(innerCubeState, cubeStateToCheck.getCubeState())) ||
-  (applyMove(cubeStateToCheck, CubeRotations.y) && applyMove(cubeStateToCheck, CubeRotations.x) && areCentersInSamePosition(innerCubeState, cubeStateToCheck.getCubeState())) || // D up, B front
-  (applyMove(cubeStateToCheck, CubeRotations.y) && areCentersInSamePosition(innerCubeState, cubeStateToCheck.getCubeState())) ||
-  (applyMove(cubeStateToCheck, CubeRotations.y) && areCentersInSamePosition(innerCubeState, cubeStateToCheck.getCubeState())) ||
-  (applyMove(cubeStateToCheck, CubeRotations.y) && areCentersInSamePosition(innerCubeState, cubeStateToCheck.getCubeState())) ||
-  (applyMove(cubeStateToCheck, CubeRotations.y) && applyMove(cubeStateToCheck, CubeRotations.x) && areCentersInSamePosition(innerCubeState, cubeStateToCheck.getCubeState())) || // B up, U front
-  (applyMove(cubeStateToCheck, CubeRotations.y) && areCentersInSamePosition(innerCubeState, cubeStateToCheck.getCubeState())) ||
-  (applyMove(cubeStateToCheck, CubeRotations.y) && areCentersInSamePosition(innerCubeState, cubeStateToCheck.getCubeState())) ||
-  (applyMove(cubeStateToCheck, CubeRotations.y) && areCentersInSamePosition(innerCubeState, cubeStateToCheck.getCubeState())) ||
-  (applyMove(cubeStateToCheck, CubeRotations.y) && applyMove(cubeStateToCheck, CubeRotations.x) && applyMove(cubeStateToCheck, CubeRotations.z) && areCentersInSamePosition(innerCubeState, cubeStateToCheck.getCubeState())) || // L up, F front
-  (applyMove(cubeStateToCheck, CubeRotations.y) && areCentersInSamePosition(innerCubeState, cubeStateToCheck.getCubeState())) ||
-  (applyMove(cubeStateToCheck, CubeRotations.y) && areCentersInSamePosition(innerCubeState, cubeStateToCheck.getCubeState())) ||
-  (applyMove(cubeStateToCheck, CubeRotations.y) && areCentersInSamePosition(innerCubeState, cubeStateToCheck.getCubeState())) ||
-  (applyMove(cubeStateToCheck, CubeRotations.z) && applyMove(cubeStateToCheck, CubeRotations.z) && areCentersInSamePosition(innerCubeState, cubeStateToCheck.getCubeState())) || // R up, D front
-  (applyMove(cubeStateToCheck, CubeRotations.y) && areCentersInSamePosition(innerCubeState, cubeStateToCheck.getCubeState())) ||
-  (applyMove(cubeStateToCheck, CubeRotations.y) && areCentersInSamePosition(innerCubeState, cubeStateToCheck.getCubeState())) ||
-  (applyMove(cubeStateToCheck, CubeRotations.y) && areCentersInSamePosition(innerCubeState, cubeStateToCheck.getCubeState()));
+  return areCentersInSamePosition(cubeState, cubeStateToCheck.getCubeState()) || // U UP, F Front
+  (applyMove(cubeStateToCheck, CubeRotations.y) && areCentersInSamePosition(cubeState, cubeStateToCheck.getCubeState())) ||
+  (applyMove(cubeStateToCheck, CubeRotations.y) && areCentersInSamePosition(cubeState, cubeStateToCheck.getCubeState())) ||
+  (applyMove(cubeStateToCheck, CubeRotations.y) && areCentersInSamePosition(cubeState, cubeStateToCheck.getCubeState())) ||
+  (applyMove(cubeStateToCheck, CubeRotations.y) && applyMove(cubeStateToCheck, CubeRotations.x) && areCentersInSamePosition(cubeState, cubeStateToCheck.getCubeState())) || // F up, D front
+  (applyMove(cubeStateToCheck, CubeRotations.y) && areCentersInSamePosition(cubeState, cubeStateToCheck.getCubeState())) ||
+  (applyMove(cubeStateToCheck, CubeRotations.y) && areCentersInSamePosition(cubeState, cubeStateToCheck.getCubeState())) ||
+  (applyMove(cubeStateToCheck, CubeRotations.y) && areCentersInSamePosition(cubeState, cubeStateToCheck.getCubeState())) ||
+  (applyMove(cubeStateToCheck, CubeRotations.y) && applyMove(cubeStateToCheck, CubeRotations.x) && areCentersInSamePosition(cubeState, cubeStateToCheck.getCubeState())) || // D up, B front
+  (applyMove(cubeStateToCheck, CubeRotations.y) && areCentersInSamePosition(cubeState, cubeStateToCheck.getCubeState())) ||
+  (applyMove(cubeStateToCheck, CubeRotations.y) && areCentersInSamePosition(cubeState, cubeStateToCheck.getCubeState())) ||
+  (applyMove(cubeStateToCheck, CubeRotations.y) && areCentersInSamePosition(cubeState, cubeStateToCheck.getCubeState())) ||
+  (applyMove(cubeStateToCheck, CubeRotations.y) && applyMove(cubeStateToCheck, CubeRotations.x) && areCentersInSamePosition(cubeState, cubeStateToCheck.getCubeState())) || // B up, U front
+  (applyMove(cubeStateToCheck, CubeRotations.y) && areCentersInSamePosition(cubeState, cubeStateToCheck.getCubeState())) ||
+  (applyMove(cubeStateToCheck, CubeRotations.y) && areCentersInSamePosition(cubeState, cubeStateToCheck.getCubeState())) ||
+  (applyMove(cubeStateToCheck, CubeRotations.y) && areCentersInSamePosition(cubeState, cubeStateToCheck.getCubeState())) ||
+  (applyMove(cubeStateToCheck, CubeRotations.y) && applyMove(cubeStateToCheck, CubeRotations.x) && applyMove(cubeStateToCheck, CubeRotations.z) && areCentersInSamePosition(cubeState, cubeStateToCheck.getCubeState())) || // L up, F front
+  (applyMove(cubeStateToCheck, CubeRotations.y) && areCentersInSamePosition(cubeState, cubeStateToCheck.getCubeState())) ||
+  (applyMove(cubeStateToCheck, CubeRotations.y) && areCentersInSamePosition(cubeState, cubeStateToCheck.getCubeState())) ||
+  (applyMove(cubeStateToCheck, CubeRotations.y) && areCentersInSamePosition(cubeState, cubeStateToCheck.getCubeState())) ||
+  (applyMove(cubeStateToCheck, CubeRotations.z) && applyMove(cubeStateToCheck, CubeRotations.z) && areCentersInSamePosition(cubeState, cubeStateToCheck.getCubeState())) || // R up, D front
+  (applyMove(cubeStateToCheck, CubeRotations.y) && areCentersInSamePosition(cubeState, cubeStateToCheck.getCubeState())) ||
+  (applyMove(cubeStateToCheck, CubeRotations.y) && areCentersInSamePosition(cubeState, cubeStateToCheck.getCubeState())) ||
+  (applyMove(cubeStateToCheck, CubeRotations.y) && areCentersInSamePosition(cubeState, cubeStateToCheck.getCubeState()));
 }

@@ -1,7 +1,7 @@
 import { FinalTwoPhaseSolver } from './FinalTwoPhaseSolver';
 import { CancellationManager } from '../utils/CancellationManager';
 import { Logger } from '../utils/Logger';
-import CubeState from '@cube-explorer/shared/src/cube/CubeState';
+import CubeState, { CubeStateType } from '@cube-explorer/shared/src/cube/CubeState';
 import { isValidCubeState } from '@cube-explorer/shared/src/cube/CubeValidation';
 
 export class SolveService {
@@ -11,10 +11,10 @@ export class SolveService {
    * Solve a cube from a cubeState object with real-time logs
    * @param cubeState - The cube state object
    */
-  static async solveCubeWithLogs(cubeState: any): Promise<{ resolution: string }> {
+  static async solveCubeWithLogs(cubeState: CubeStateType): Promise<{ resolution: string }> {
     const startTime = Date.now();
     Logger.log(`🔧 Starting cube solving for cubeState`, { sendToFrontend: true });
-    Logger.log(`🧪 Testing cubeState: ${JSON.stringify(cubeState)}`);
+    Logger.log('🧪 Testing cubeState');
     
     try {
       // Check if operation was cancelled
