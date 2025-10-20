@@ -1,5 +1,6 @@
 import { CubeFace, cubeFaces, CubeFaces } from "./CubeFace";
 import { type CubeFacet, CubeFacets } from "./CubeFacet";
+import { isValidCubeState } from "./CubeValidation";
 
 type CubeStateType = {
   [key in CubeFace]: CubeFacet[];
@@ -65,6 +66,10 @@ export default class CubeState {
       }
     }
     return true;
+  }
+
+  isValid() {
+    return isValidCubeState(this.cubeState);
   }
 }
 

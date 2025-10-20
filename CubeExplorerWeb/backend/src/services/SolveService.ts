@@ -2,7 +2,6 @@ import { FinalTwoPhaseSolver } from './FinalTwoPhaseSolver';
 import { CancellationManager } from '../utils/CancellationManager';
 import { Logger } from '../utils/Logger';
 import CubeState, { CubeStateType } from '@cube-explorer/shared/src/cube/CubeState';
-import { isValidCubeState } from '@cube-explorer/shared/src/cube/CubeValidation';
 
 export class SolveService {
 
@@ -14,7 +13,18 @@ export class SolveService {
   static async solveCubeWithLogs(cubeState: CubeStateType): Promise<{ resolution: string }> {
     const startTime = Date.now();
     Logger.log(`🔧 Starting cube solving for cubeState`, { sendToFrontend: true });
-    Logger.log('🧪 Testing cubeState');
+    // Convert cubeState to CubeState object
+    const conversionStartTime = Date.now();
+
+    Logger.log(`🔄 Converting cubeState to CubeState object`);
+  
+    // Create a CubeState object from the received cubeState
+    const cubeStateObj = new CubeState();
+    cubeStateObj.setCubeState(cubeState);
+    Logger.log(`📊 Frontend cube state: ${cubeStateObj.toString()}`);
+
+    const conversionTime = Date.now() - conversionStartTime;
+    Logger.info(`CubeState converted in ${conversionTime}ms`, { sendToFrontend: true });
     
     try {
       // Check if operation was cancelled
@@ -25,7 +35,7 @@ export class SolveService {
       
       // Validate the cubeState
       const validationStartTime = Date.now();
-      if (!isValidCubeState(cubeState)) {
+      if (!cubeStateObj.isValid()) {
         throw new Error('Invalid cubeState format');
       }
       const validationTime = Date.now() - validationStartTime;
@@ -37,18 +47,7 @@ export class SolveService {
         return { resolution: 'Operation cancelled by user' };
       }
 
-      // Convert cubeState to CubeState object
-      const conversionStartTime = Date.now();
-
-      Logger.log(`🔄 Converting cubeState to CubeState object`);
-    
-      // Create a CubeState object from the received cubeState
-      const cubeStateObj = new CubeState();
-      cubeStateObj.setCubeState(cubeState);
-      Logger.log(`📊 Frontend cube state: ${cubeStateObj.toString()}`);
-
-      const conversionTime = Date.now() - conversionStartTime;
-      Logger.info(`CubeState converted in ${conversionTime}ms`, { sendToFrontend: true });
+      
       
       // Check if operation was cancelled
       if (CancellationManager.isCancelled) {
