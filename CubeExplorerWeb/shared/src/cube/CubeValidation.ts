@@ -13,10 +13,6 @@ const oppositeFaces = [
   {face: CubeFaces.RIGHT, oppositeFace: CubeFaces.LEFT},
 ]
 
-function isCorner(cubie: Edge | Corner): cubie is Corner {
-  return 'facet3' in cubie;
-}
-
 function isEdge(cubie: Edge | Corner): cubie is Edge {
   return 'facet2' in cubie && !('facet3' in cubie);
 }
@@ -28,7 +24,7 @@ function isEdge(cubie: Edge | Corner): cubie is Edge {
  */
 export function isValidCubeState(cubeState: CubeStateType): boolean {
   if (!cubeState || typeof cubeState !== 'object') {
-    return false;
+    throw new Error('Invalid cube state, not an object');
   }
 
   // Count occurrences of each color across all faces
@@ -37,36 +33,32 @@ export function isValidCubeState(cubeState: CubeStateType): boolean {
   // Check if all required faces are present
   for (const face of cubeFaces) {
     if (!cubeState[face] || !Array.isArray(cubeState[face]) || cubeState[face].length !== 9) {
-      return false;
+      throw new Error(`Invalid cube state, face ${face} is invalid`);
     }
     for (const color of cubeState[face]) {
       colorCount[color] = (colorCount[color] || 0) + 1;
       if (colorCount[color] > 9) {
-        return false;
+        throw new Error(`Invalid cube state, color ${color} appears more than 9 times`);
       }
     }
   }
   
   // Check that centers are in their correct relative positions
   if (!areCentersInCorrectRelativePositions(cubeState)) {
-    return false;
+    throw new Error('Invalid cube state, centers are not in correct relative positions');
   }
 
-  try {
-    const { parity: cornerParity, orientation: cornerOrientation } = visitCubies(Corners, cubeState);
-    if (cornerOrientation % 3 !== 0) {
-      return false;
-    }
-    const { parity: edgeParity, orientation: edgeOrientation } = visitCubies(Edges, cubeState);
-    if (edgeOrientation % 2 !== 0) {
-      return false;
-    }
-    // check full parity
-    if (cornerParity !== edgeParity) {
-      return false;
-    }
-  } catch (error) {
-    return false;
+  const { parity: cornerParity, orientation: cornerOrientation } = visitCubies(Corners, cubeState);
+  if (cornerOrientation % 3 !== 0) {
+    throw new Error('Invalid cube state, corner orientation is not 0 modulo 3');
+  }
+  const { parity: edgeParity, orientation: edgeOrientation } = visitCubies(Edges, cubeState);
+  if (edgeOrientation % 2 !== 0) {
+    throw new Error('Invalid cube state, edge orientation is not 0 modulo 2');
+  }
+  // check full parity
+  if (cornerParity !== edgeParity) {
+    throw new Error('Invalid cube state, corner parity is not equal to edge parity');
   }
 
   return true;
