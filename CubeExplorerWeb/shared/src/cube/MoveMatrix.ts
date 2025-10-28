@@ -1,4 +1,4 @@
-import { CubeFace } from "./CubeFace";
+import { type CubeFace } from "./CubeFace";
 
 export type MatrixPoint = {
     face: CubeFace;

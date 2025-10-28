@@ -1,4 +1,4 @@
-import { CubeFace, cubeFaces, CubeFaces } from "./CubeFace";
+import { cubeFaces, CubeFaces, type CubeFace } from "./CubeFace";
 import { type CubeFacet, CubeFacets } from "./CubeFacet";
 import { isValidCubeState } from "./CubeValidation";
 

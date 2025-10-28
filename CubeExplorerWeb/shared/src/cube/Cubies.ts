@@ -1,5 +1,5 @@
 import { CubeFaces } from './CubeFace';
-import { MatrixPoint } from './MoveMatrix';
+import { type MatrixPoint } from './MoveMatrix';
 
 /**
  * Represents an edge piece with its two colors

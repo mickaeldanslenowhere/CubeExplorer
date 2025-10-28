@@ -1,7 +1,7 @@
 import CubeState, { defaultCubeState, type CubeStateType } from './CubeState';
-import { applyMove, CubeRotations, cubeRotations } from './CubeMove';
-import { CubeFace, CubeFaces, cubeFaces } from './CubeFace';
-import { Corner, Corners, Edge, Edges } from './Cubies';
+import { applyMove, CubeRotations } from './CubeMove';
+import { CubeFaces, cubeFaces, type CubeFace } from './CubeFace';
+import { Corners, Edges, type Corner, type Edge } from './Cubies';
 import { CubeFacets } from './CubeFacet';
 
 const oppositeFaces = [
@@ -142,9 +142,9 @@ function findCornerOnStateInAnother(corner: Corner | null, state1: CubeStateType
     return null;
   }
   for (const cubie of Corners) {
-    const state2Facet1 = defaultCubeState[cubie.facet1.face][cubie.facet1.index];
-    const state2Facet2 = defaultCubeState[cubie.facet2.face][cubie.facet2.index];
-    const state2Facet3 = defaultCubeState[cubie.facet3.face][cubie.facet3.index];
+    const state2Facet1 = state2[cubie.facet1.face][cubie.facet1.index];
+    const state2Facet2 = state2[cubie.facet2.face][cubie.facet2.index];
+    const state2Facet3 = state2[cubie.facet3.face][cubie.facet3.index];
     if ((state1Facet1 === state2Facet1 && state1Facet2 === state2Facet2 && state1Facet3 === state2Facet3) ||
         (state1Facet1 === state2Facet1 && state1Facet2 === state2Facet3 && state1Facet3 === state2Facet2) ||
         (state1Facet1 === state2Facet2 && state1Facet2 === state2Facet1 && state1Facet3 === state2Facet3) ||
@@ -279,7 +279,10 @@ function visitCubies(cubies: Edge[] | Corner[], cubeState: CubeStateType): { par
     const unvisitedIndex = visitedCubies.findIndex(visited => !visited);
     if (unvisitedIndex === -1) break;
     
+    console.log(`Unvisited index: ${unvisitedIndex} --> ${cubies[unvisitedIndex]}`);
     const { cycleLength, orientation: cubieOrientation } = followCubieCycle(cubies[unvisitedIndex], cubeState, visitedCubies);
+    console.log(`Cycle length: ${cycleLength}`);
+    
     parity += cycleLength;
     orientation += cubieOrientation;
   }

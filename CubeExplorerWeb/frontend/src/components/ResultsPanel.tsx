@@ -24,6 +24,18 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = ({
 }) => {
   const { cubeState } = useCubeContext();
 
+  // Validate cube state
+  const validateCubeState = () => {
+    try {
+      cubeState.isValid();
+      return { isValid: true, error: null };
+    } catch (error) {
+      return { isValid: false, error: error instanceof Error ? error.message : 'Unknown validation error' };
+    }
+  };
+
+  const validation = validateCubeState();
+
   const formatTimestamp = (timestamp: string) => {
     return new Date(timestamp).toLocaleTimeString();
   };
@@ -54,6 +66,20 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = ({
         <div className="text-xs text-gray-600 font-mono bg-gray-50 p-2 rounded border">
           {cubeState.toString()}
         </div>
+      </div>
+
+      {/* Cube State Validation */}
+      <div className="mb-4 bg-white border border-gray-200 rounded p-3">
+        <div className="text-sm font-semibold text-gray-700 mb-2">Cube State Validation</div>
+        {validation.isValid ? (
+          <div className="text-xs text-green-600 font-semibold">
+            ✓ Cube state is valid
+          </div>
+        ) : (
+          <div className="text-xs text-red-600 font-semibold">
+            ✗ {validation.error}
+          </div>
+        )}
       </div>
 
       {isSolving && (
