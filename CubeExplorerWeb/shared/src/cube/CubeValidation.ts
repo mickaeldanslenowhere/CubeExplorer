@@ -223,6 +223,30 @@ function getEdgeOrientation(edge: Edge, defaultEdge: Edge, cubeState: CubeStateT
   }
 }
 
+// Helper function to convert face names to letters
+function faceToLetter(face: string): string {
+  switch (face) {
+    case 'up': return 'U';
+    case 'front': return 'F';
+    case 'down': return 'D';
+    case 'back': return 'B';
+    case 'left': return 'L';
+    case 'right': return 'R';
+    default: return face;
+  }
+}
+
+// Helper function to get concise cubie names
+function getCubieName(cubie: Edge | Corner): string {
+  if (isEdge(cubie)) {
+    const edge = cubie as Edge;
+    return `${faceToLetter(edge.facet1.face)}${faceToLetter(edge.facet2.face)}`;
+  } else {
+    const corner = cubie as Corner;
+    return `${faceToLetter(corner.facet1.face)}${faceToLetter(corner.facet2.face)}${faceToLetter(corner.facet3.face)}`;
+  }
+}
+
 function followCubieCycle(startCubie: Edge | Corner, cubeState: CubeStateType, visitedCubies: boolean[]): {
   cycleLength: number;
   orientation: number;
@@ -231,12 +255,34 @@ function followCubieCycle(startCubie: Edge | Corner, cubeState: CubeStateType, v
   let cycleLength = 0;
   let orientation = 0;
   
+  const isCorner = !isEdge(cubieToCheck);
+  const cubieName = getCubieName(cubieToCheck);
+  
+  console.log(`\n=== DÉBUT CYCLE ${isCorner ? 'COIN' : 'ARÊTE'} ===`);
+  console.log(`${isCorner ? 'Coin' : 'Arête'} ${cubieName}`);
+  
   while (cubieToCheck) {
     const cubieIndex = isEdge(cubieToCheck) ? Edges.indexOf(cubieToCheck) : Corners.indexOf(cubieToCheck);
+    
+    // Log de la pièce actuelle
+    if (isCorner) {
+      const corner = cubieToCheck as Corner;
+      const f1Color = cubeState[corner.facet1.face][corner.facet1.index];
+      const f2Color = cubeState[corner.facet2.face][corner.facet2.index];
+      const f3Color = cubeState[corner.facet3.face][corner.facet3.index];
+      console.log(`-> ${faceToLetter(corner.facet1.face)}: ${f1Color}, ${faceToLetter(corner.facet2.face)}: ${f2Color}, ${faceToLetter(corner.facet3.face)}: ${f3Color}`);
+    } else {
+      const edge = cubieToCheck as Edge;
+      const f1Color = cubeState[edge.facet1.face][edge.facet1.index];
+      const f2Color = cubeState[edge.facet2.face][edge.facet2.index];
+      console.log(`-> ${faceToLetter(edge.facet1.face)}: ${f1Color}, ${faceToLetter(edge.facet2.face)}: ${f2Color}`);
+    }
+    
     // If we've already visited this cubie, it's an unsolvable cube
     if (visitedCubies[cubieIndex]) {
       // we are back to the buffer
       if (cycleLength > 0 && cubieToCheck === startCubie) {
+        console.log(`✓ Cycle terminé - Longueur: ${cycleLength}, Orientation: ${orientation}`);
         return {
           cycleLength: cycleLength,
           orientation: orientation,
@@ -250,23 +296,42 @@ function followCubieCycle(startCubie: Edge | Corner, cubeState: CubeStateType, v
     if (initialCubiePlace === null) {
       throw new Error('Cubie not found in default cube state');
     }
+    
+    // Log de la position initiale attendue
+    if (isCorner) {
+      const corner = initialCubiePlace as Corner;
+      const f1Color = defaultCubeState[corner.facet1.face][4];
+      const f2Color = defaultCubeState[corner.facet2.face][4];
+      const f3Color = defaultCubeState[corner.facet3.face][4];
+      console.log(`(position cube initial : ${faceToLetter(corner.facet1.face)}${faceToLetter(corner.facet2.face)}${faceToLetter(corner.facet3.face)} -> ${faceToLetter(corner.facet1.face)}: ${f1Color}, ${faceToLetter(corner.facet2.face)}: ${f2Color}, ${faceToLetter(corner.facet3.face)}: ${f3Color})`);
+    } else {
+      const edge = initialCubiePlace as Edge;
+      const f1Color = defaultCubeState[edge.facet1.face][4];
+      const f2Color = defaultCubeState[edge.facet2.face][4];
+      console.log(`(position cube initial : ${faceToLetter(edge.facet1.face)}${faceToLetter(edge.facet2.face)} -> ${faceToLetter(edge.facet1.face)}: ${f1Color}, ${faceToLetter(edge.facet2.face)}: ${f2Color})`);
+    }
+    
     // orientation check
-    orientation += isEdge(cubieToCheck) ? getEdgeOrientation(cubieToCheck, initialCubiePlace, cubeState) : getCornerOrientation(cubieToCheck, cubeState);
+    const currentOrientation = isEdge(cubieToCheck) ? getEdgeOrientation(cubieToCheck, initialCubiePlace, cubeState) : getCornerOrientation(cubieToCheck, cubeState);
+    orientation += currentOrientation;
+    console.log(`orientation : ${currentOrientation} (total: ${orientation})`);
 
     // the cubie was in the good position at start
     if (initialCubiePlace === startCubie) {
+      console.log(`✓ Pièce déjà à sa place - Longueur: ${cycleLength}, Orientation: ${orientation}`);
       return {
         cycleLength: cycleLength,
         orientation: orientation,
       };
     }
 
-    cubieToCheck = isEdge(cubieToCheck) ? findDefaultEdgeInCubeState(initialCubiePlace as Edge, cubeState) : findDefaultCornerInCubeState(initialCubiePlace as Corner, cubeState);
+    cubieToCheck = initialCubiePlace;
     if (cubieToCheck === null) {
       throw new Error('Cubie not found current cube state');
     }
     // Mark as visited and increment counter
     cycleLength++;
+    console.log(`-> Suivant: ${isCorner ? 'Coin' : 'Arête'} ${getCubieName(cubieToCheck)} (étape ${cycleLength})`);
   }
 
   throw new Error('We should have never reached this point');
@@ -277,17 +342,29 @@ function visitCubies(cubies: Edge[] | Corner[], cubeState: CubeStateType): { par
   let parity = 0;
   let orientation = 0;
   
+  const isCorner = cubies.length === 8; // 8 coins, 12 arêtes
+  console.log(`\n🔍 === ANALYSE DES ${isCorner ? 'COINS' : 'ARÊTES'} ===`);
+  
+  let cycleCount = 0;
   while (visitedCubies.includes(false)) {
     const unvisitedIndex = visitedCubies.findIndex(visited => !visited);
     if (unvisitedIndex === -1) break;
     
-    console.log(`Unvisited index: ${unvisitedIndex} --> ${JSON.stringify(cubies[unvisitedIndex])}`);
+    cycleCount++;
+    const cubieName = getCubieName(cubies[unvisitedIndex]);
+    
+    console.log(`\n📍 CYCLE ${cycleCount} - ${isCorner ? 'Coin' : 'Arête'} ${cubieName} (index ${unvisitedIndex})`);
     const { cycleLength, orientation: cubieOrientation } = followCubieCycle(cubies[unvisitedIndex], cubeState, visitedCubies);
-    console.log(`Cycle length: ${cycleLength}`);
+    console.log(`📊 Résultat cycle ${cycleCount}: Longueur=${cycleLength}, Orientation=${cubieOrientation}`);
     
     parity += cycleLength;
     orientation += cubieOrientation;
   }
+
+  console.log(`\n📈 === RÉSUMÉ ${isCorner ? 'COINS' : 'ARÊTES'} ===`);
+  console.log(`Total cycles: ${cycleCount}`);
+  console.log(`Parité totale: ${parity} (mod 2: ${parity % 2})`);
+  console.log(`Orientation totale: ${orientation}`);
 
   return {
     parity: parity % 2,
