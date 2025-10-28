@@ -49,10 +49,12 @@ export function isValidCubeState(cubeState: CubeStateType): boolean {
   }
 
   const { parity: cornerParity, orientation: cornerOrientation } = visitCubies(Corners, cubeState);
+  console.log(`Corner parity: ${cornerParity}, corner orientation: ${cornerOrientation}`);
   if (cornerOrientation % 3 !== 0) {
     throw new Error('Invalid cube state, corner orientation is not 0 modulo 3');
   }
   const { parity: edgeParity, orientation: edgeOrientation } = visitCubies(Edges, cubeState);
+  console.log(`Edge parity: ${edgeParity}, edge orientation: ${edgeOrientation}`);
   if (edgeOrientation % 2 !== 0) {
     throw new Error('Invalid cube state, edge orientation is not 0 modulo 2');
   }
@@ -279,7 +281,7 @@ function visitCubies(cubies: Edge[] | Corner[], cubeState: CubeStateType): { par
     const unvisitedIndex = visitedCubies.findIndex(visited => !visited);
     if (unvisitedIndex === -1) break;
     
-    console.log(`Unvisited index: ${unvisitedIndex} --> ${cubies[unvisitedIndex]}`);
+    console.log(`Unvisited index: ${unvisitedIndex} --> ${JSON.stringify(cubies[unvisitedIndex])}`);
     const { cycleLength, orientation: cubieOrientation } = followCubieCycle(cubies[unvisitedIndex], cubeState, visitedCubies);
     console.log(`Cycle length: ${cycleLength}`);
     
