@@ -1,36 +1,10 @@
 import React from 'react';
 import { useCubeContext } from '../hooks/useContexts';
 
-interface CycleInfo {
-  cubies: string[];
-  orientations: { [cubieName: string]: number };
-}
+export const BlindCyclesPanel: React.FC = () => {
+  const { cubeState } = useCubeContext();
 
-interface BlindCyclesPanelProps {
-  cornerCycles: CycleInfo[];
-  edgeCycles: CycleInfo[];
-}
-
-export const BlindCyclesPanel: React.FC<BlindCyclesPanelProps> = ({
-  cornerCycles,
-  edgeCycles,
-}) => {
-  const formatCycle = (cycle: CycleInfo) => {
-    if (cycle.cubies.length <= 1) return null;
-    return cycle.cubies.join(' → ');
-  };
-
-  const formatSingleCubieOrientations = (cycle: CycleInfo) => {
-    if (cycle.cubies.length !== 1) return null;
-    const cubieName = cycle.cubies[0];
-    const orientation = cycle.orientations[cubieName];
-    return `${cubieName}: ${orientation}`;
-  };
-
-  const multiCycles = cornerCycles.filter(cycle => cycle.cubies.length > 1);
-  const singleCornerCycles = cornerCycles.filter(cycle => cycle.cubies.length === 1);
-  const multiEdgeCycles = edgeCycles.filter(cycle => cycle.cubies.length > 1);
-  const singleEdgeCycles = edgeCycles.filter(cycle => cycle.cubies.length === 1);
+  const blindAnalytics = cubeState.getBlindAnalytics();
 
   return (
     <div className="bg-blue-50 border border-blue-200 rounded p-4">
@@ -40,23 +14,23 @@ export const BlindCyclesPanel: React.FC<BlindCyclesPanelProps> = ({
       <div className="mb-4">
         <div className="text-sm font-semibold text-blue-700 mb-2">Coins :</div>
         
-        {multiCycles.length > 0 && (
+        {blindAnalytics.corners.cornersResult.cycles.length > 0 && (
           <div className="text-sm text-blue-600 mb-2">
-            Cycles: {multiCycles.map((cycle, index) => (
+            Cycles: {blindAnalytics.corners.cornersResult.cycles.map((cycle, index) => (
               <span key={index}>
-                {formatCycle(cycle)}
-                {index < multiCycles.length - 1 ? ' / ' : ''}
+                {cycle}
+                {index < blindAnalytics.corners.cycles.length - 1 ? ' / ' : ''}
               </span>
             ))}
           </div>
         )}
         
-        {singleCornerCycles.length > 0 && (
+        {blindAnalytics.corners.cornersResult.orientations.length > 0 && (
           <div className="text-sm text-blue-600">
-            Orientation: {singleCornerCycles.map((cycle, index) => (
+            Orientation: {blindAnalytics.corners.cornersResult.orientations.map((orientation, index) => (
               <span key={index}>
-                {formatSingleCubieOrientations(cycle)}
-                {index < singleCornerCycles.length - 1 ? ' / ' : ''}
+                {orientation}
+                {index < blindAnalytics.corners.cornersResult.orientations.length - 1 ? ' / ' : ''}
               </span>
             ))}
           </div>
@@ -67,23 +41,23 @@ export const BlindCyclesPanel: React.FC<BlindCyclesPanelProps> = ({
       <div>
         <div className="text-sm font-semibold text-blue-700 mb-2">Arêtes :</div>
         
-        {multiEdgeCycles.length > 0 && (
+        {blindAnalytics.edges.edgesResult.cycles.length > 0 && (
           <div className="text-sm text-blue-600 mb-2">
-            Cycles: {multiEdgeCycles.map((cycle, index) => (
+            Cycles: {blindAnalytics.edges.edgesResult.cycles.map((cycle, index) => (
               <span key={index}>
-                {formatCycle(cycle)}
-                {index < multiEdgeCycles.length - 1 ? ' / ' : ''}
+                {cycle}
+                {index < blindAnalytics.edges.edgesResult.cycles.length - 1 ? ' / ' : ''}
               </span>
             ))}
           </div>
         )}
         
-        {singleEdgeCycles.length > 0 && (
+        {blindAnalytics.edges.edgesResult.orientations.length > 0 && (
           <div className="text-sm text-blue-600">
-            Orientation: {singleEdgeCycles.map((cycle, index) => (
+            Orientation: {blindAnalytics.edges.edgesResult.orientations.map((orientation, index) => (
               <span key={index}>
-                {formatSingleCubieOrientations(cycle)}
-                {index < singleEdgeCycles.length - 1 ? ' / ' : ''}
+                {orientation}
+                {index < blindAnalytics.edges.edgesResult.orientations.length - 1 ? ' / ' : ''}
               </span>
             ))}
           </div>

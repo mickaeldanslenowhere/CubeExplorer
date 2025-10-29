@@ -1,4 +1,3 @@
-import React from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { colors } from './hooks/useColors';
@@ -18,53 +17,16 @@ import { ResultsPanel } from './components/ResultsPanel';
 import ColorButton from './components/ColorButton';
 import { Cube3DIsometric } from './components/Cube2D/CubeIsometric3D';
 import { BlindCyclesPanel } from './components/BlindCyclesPanel';
-import { getCubeCycles, type CycleInfo } from '@cube-explorer/shared/src/cube/CubeValidation';
 
 
 
 function AppContent() {
   const { selectedColor, setSelectedColor } = useColorContext();
-  const { defaultCubeState, setCubeState, cubeState } = useCubeContext();
+  const { defaultCubeState, setCubeState } = useCubeContext();
   const { setInputInvalid } = useScrambleContext();
   const { viewMode, setViewMode } = useViewMode();
   const { solveCube, cancelSolve, clearResults, isSolving, results, error, realTimeLogs } = useSolve();
 
-  // Analyser les cycles - même logique que la validation
-  const analyzeCycles = () => {
-    try {
-      const currentCubeState = cubeState.getCubeState();
-      const cubeCycles = getCubeCycles(currentCubeState);
-      return cubeCycles;
-    } catch (error) {
-      return null;
-    }
-  };
-
-  const cycles = analyzeCycles();
-
-  // Function to determine if a cubie should be rendered for the L-shape
-  // Based on the image: bottom layer + top layer + left column of middle layer
-  /* const isCubiePresent = (x: number, y: number, _z: number): boolean => { // eslint-disable-line @typescript-eslint/no-unused-vars
-    // Bottom layer (y=0) - all 9 cubies
-    if (y === 0) return true;
-    
-    // Top layer (y=2) - all 9 cubies  
-    if (y === 2) return true;
-    
-    // Middle layer (y=1) - only leftmost column (x=0)
-    if (y === 1 && x === 0) return true;
-    
-    return false;
-  }; */
-
-
-
-  // 3x3x3 Rubik's Cube component for rotating view
-  /* const RubiksCube3x3 = ({ cubeState }: { cubeState: Record<string, string[]> }) => {
-    return (
-      <RubiksCube3x3Base cubeStateFor3D={cubeState} />
-    );
-  };*/
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-2">
@@ -211,14 +173,9 @@ function AppContent() {
       </div>
 
       {/* Blind Cycles Panel - Full width below the main content */}
-      {cycles && (
-        <div className="w-full max-w-7xl p-4 bg-gray-50 border-t border-gray-300 mt-4 rounded-lg">
-          <BlindCyclesPanel 
-            cornerCycles={cycles.cornerCycles}
-            edgeCycles={cycles.edgeCycles}
-          />
+      <div className="w-full max-w-7xl p-4 bg-gray-50 border-t border-gray-300 mt-4 rounded-lg">
+          <BlindCyclesPanel />
         </div>
-      )}
     </div>
   );
 }

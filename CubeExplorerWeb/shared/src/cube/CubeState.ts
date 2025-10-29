@@ -1,6 +1,10 @@
+import { BlindAnalyticsVisitor } from "./BlindAnalyticsVisitor";
 import { cubeFaces, CubeFaces, type CubeFace } from "./CubeFace";
 import { type CubeFacet, CubeFacets } from "./CubeFacet";
 import { isValidCubeState } from "./CubeValidation";
+import { Corner, Corners, Cubies, Edge, Edges } from "./Cubies";
+import CubiesCycle, { CubiesCycleVisitResult } from "./CubiesCycle";
+import { findCubieInDefaultCube } from "./findCubieInCube";
 
 type CubeStateType = {
   [key in CubeFace]: CubeFacet[];
@@ -69,7 +73,59 @@ export default class CubeState {
   }
 
   isValid() {
-    return isValidCubeState(this.cubeState);
+    return isValidCubeState(this);
+  }
+
+  getBlindAnalytics() {
+    return BlindAnalyticsVisitor.getInstance().visit(this);
+  }
+
+  getCornersCycles() {
+    return this.extractCycles(Corners);
+  }
+
+  getEdgesCycles() {
+    return this.extractCycles(Edges);
+  }
+
+  private extractCycles<Cubie extends Edge | Corner>(cubies: Cubie[]): CubiesCycle<Cubie>[] {
+    const visitedCubies = new Array(cubies.length).fill(false);
+    const cycles: CubiesCycle<Cubie>[] = [];
+    while (visitedCubies.includes(false)) {
+      const unvisitedIndex = visitedCubies.findIndex(visited => !visited);
+      if (unvisitedIndex === -1) break;
+      // now, follow the cycle
+      let cubieToCheck: Cubie = cubies[unvisitedIndex];
+      let cycleLength = 0;
+      const cycle = new CubiesCycle<Cubie>();
+      let endCycle = false;
+      while (!endCycle) {
+        const cubieToCheckIndex = cubies.indexOf(cubieToCheck);
+        if (visitedCubies[cubieToCheckIndex]) {
+          if (cycleLength > 0 && cubieToCheck === cubies[unvisitedIndex]) {
+            // back to buffer
+            endCycle = true;
+            break;
+          }
+          throw new Error('Unsolvable cube: infinite cycle detected');
+        }
+        visitedCubies[cubieToCheckIndex] = true;
+        cycle.addCubie(cubieToCheck);
+        const nextCubie = findCubieInDefaultCube(cubieToCheck, this.cubeState);
+        if (nextCubie === null) {
+          throw new Error('Cubie not found in default cube state');
+        }
+        if (nextCubie === cubieToCheck) {
+          // cubie is already in the good position
+          endCycle = true;
+          break;
+        }
+        cubieToCheck = nextCubie;
+        cycleLength++;
+      }
+      cycles.push(cycle);
+    }
+    return cycles;
   }
 }
 
