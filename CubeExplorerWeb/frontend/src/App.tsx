@@ -1,3 +1,4 @@
+import React from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { colors } from './hooks/useColors';
@@ -16,15 +17,30 @@ import { useSolve } from './hooks/useSolve';
 import { ResultsPanel } from './components/ResultsPanel';
 import ColorButton from './components/ColorButton';
 import { Cube3DIsometric } from './components/Cube2D/CubeIsometric3D';
+import { BlindCyclesPanel } from './components/BlindCyclesPanel';
+import { getCubeCycles, type CycleInfo } from '@cube-explorer/shared/src/cube/CubeValidation';
 
 
 
 function AppContent() {
   const { selectedColor, setSelectedColor } = useColorContext();
-  const { defaultCubeState, setCubeState } = useCubeContext();
+  const { defaultCubeState, setCubeState, cubeState } = useCubeContext();
   const { setInputInvalid } = useScrambleContext();
   const { viewMode, setViewMode } = useViewMode();
   const { solveCube, cancelSolve, clearResults, isSolving, results, error, realTimeLogs } = useSolve();
+
+  // Analyser les cycles - même logique que la validation
+  const analyzeCycles = () => {
+    try {
+      const currentCubeState = cubeState.getCubeState();
+      const cubeCycles = getCubeCycles(currentCubeState);
+      return cubeCycles;
+    } catch (error) {
+      return null;
+    }
+  };
+
+  const cycles = analyzeCycles();
 
   // Function to determine if a cubie should be rendered for the L-shape
   // Based on the image: bottom layer + top layer + left column of middle layer
@@ -51,7 +67,7 @@ function AppContent() {
   };*/
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-2">
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-2">
       <div className="bg-white shadow-lg rounded-lg flex w-full max-w-7xl">
         {/* Main Cube Display - Left side */}
         <div className="flex-1 p-4 flex flex-col">
@@ -193,6 +209,16 @@ function AppContent() {
           </div>
         </div>
       </div>
+
+      {/* Blind Cycles Panel - Full width below the main content */}
+      {cycles && (
+        <div className="w-full max-w-7xl p-4 bg-gray-50 border-t border-gray-300 mt-4 rounded-lg">
+          <BlindCyclesPanel 
+            cornerCycles={cycles.cornerCycles}
+            edgeCycles={cycles.edgeCycles}
+          />
+        </div>
+      )}
     </div>
   );
 }
