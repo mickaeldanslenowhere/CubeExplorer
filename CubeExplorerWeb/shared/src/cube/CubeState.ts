@@ -76,23 +76,33 @@ export default class CubeState {
     return isValidCubeState(this);
   }
 
-  getBlindAnalytics() {
-    return BlindAnalyticsVisitor.getInstance().visit(this);
+  getBlindAnalytics(cornerBuffer?: Corner, edgeBuffer?: Edge) {
+    return BlindAnalyticsVisitor.getInstance().visit(this, cornerBuffer, edgeBuffer);
   }
 
-  getCornersCycles() {
-    return this.extractCycles(Corners);
+  getCornersCycles(cornerBuffer?: Corner) {
+    return this.extractCycles(Corners, cornerBuffer);
   }
 
-  getEdgesCycles() {
-    return this.extractCycles(Edges);
+  getEdgesCycles(edgeBuffer?: Edge) {
+    return this.extractCycles(Edges, edgeBuffer);
   }
 
-  private extractCycles<Cubie extends Edge | Corner>(cubies: Cubie[]): CubiesCycle<Cubie>[] {
+  private extractCycles<Cubie extends Edge | Corner>(cubies: Cubie[], buffer?: Cubie): CubiesCycle<Cubie>[] {
     const visitedCubies = new Array(cubies.length).fill(false);
     const cycles: CubiesCycle<Cubie>[] = [];
     while (visitedCubies.includes(false)) {
-      const unvisitedIndex = visitedCubies.findIndex(visited => !visited);
+      let unvisitedIndex: number;
+      if (buffer) {
+        // Commencer par le buffer s'il est fourni
+        unvisitedIndex = cubies.indexOf(buffer);
+        if (unvisitedIndex === -1 || visitedCubies[unvisitedIndex]) {
+          // Buffer déjà visité ou pas trouvé, prendre le premier non visité
+          unvisitedIndex = visitedCubies.findIndex(visited => !visited);
+        }
+      } else {
+        unvisitedIndex = visitedCubies.findIndex(visited => !visited);
+      }
       if (unvisitedIndex === -1) break;
       // now, follow the cycle
       let cubieToCheck: Cubie = cubies[unvisitedIndex];

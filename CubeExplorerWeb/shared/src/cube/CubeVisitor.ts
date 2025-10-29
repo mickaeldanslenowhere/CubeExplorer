@@ -57,11 +57,11 @@ export abstract class CubeVisitor<CubieInfo, CycleResult, GroupResult, CubeResul
     protected abstract initialGroupAccumulator(): GroupResult;
     protected abstract initialCubeAccumulator(): CubeResult;
 
-    visit(cubeState: CubeState) {
-        return this.innerVisit(cubeState);
+    visit(cubeState: CubeState, cornerBuffer?: Corner, edgeBuffer?: Edge) {
+        return this.innerVisit(cubeState, cornerBuffer, edgeBuffer);
     }
     
-    private innerVisit(cubeState: CubeState): {
+    private innerVisit(cubeState: CubeState, cornerBuffer?: Corner, edgeBuffer?: Edge): {
         result: CubeResult;
         corners: {
             cycles: Cyclix<Corner, CubieInfo, CycleResult>[];
@@ -80,8 +80,8 @@ export abstract class CubeVisitor<CubieInfo, CycleResult, GroupResult, CubeResul
             }
         }
         this.cubeState = cubeState;
-        const cornersCycles = cubeState.getCornersCycles();
-        const edgesCycles = cubeState.getEdgesCycles();
+        const cornersCycles = cubeState.getCornersCycles(cornerBuffer);
+        const edgesCycles = cubeState.getEdgesCycles(edgeBuffer);
         const corners: {
             cycles: Cyclix<Corner, CubieInfo, CycleResult>[];
             cornersResult: GroupResult;
