@@ -17,6 +17,7 @@ import { ResultsPanel } from './components/ResultsPanel';
 import ColorButton from './components/ColorButton';
 import { Cube3DIsometric } from './components/Cube2D/CubeIsometric3D';
 import { BlindCyclesPanel } from './components/BlindCyclesPanel';
+import { MainContent } from './components/MainContent';
 
 
 
@@ -29,11 +30,12 @@ function AppContent() {
 
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-2">
-      <div className="bg-white shadow-lg rounded-lg flex w-full max-w-7xl">
+    <MainContent>
+      <div className="bg-gray-100 flex flex-col items-center p-2">
+        <div className="bg-white shadow-lg rounded-lg flex w-full max-w-7xl">
         {/* Main Cube Display - Left side */}
         <div className="flex-1 p-4 flex flex-col">
-          <div className="bg-gray-200 border border-gray-400 rounded p-6 h-full flex items-center justify-center relative" style={{paddingLeft: '80px', paddingRight: '80px'}}>
+          <div className="bg-gray-200 border border-gray-400 rounded p-6 min-h-96 flex items-center justify-center relative" style={{paddingLeft: '80px', paddingRight: '80px'}}>
             {/* View Mode Selector - Overlay on the left */}
             <div className="absolute left-2 top-2 flex flex-col space-y-1 bg-white border border-gray-300 rounded p-2 shadow-sm">
               <ControlButton label="2D" onClick={() => setViewMode('2d')} className="text-xs px-2 py-1" />
@@ -172,11 +174,12 @@ function AppContent() {
         </div>
       </div>
 
-      {/* Blind Cycles Panel - Full width below the main content */}
-      <div className="w-full max-w-7xl p-4 bg-gray-50 border-t border-gray-300 mt-4 rounded-lg">
+        {/* Blind Cycles Panel - Full width below the main content */}
+        <div className="w-full max-w-7xl p-4 bg-gray-50 border-t border-gray-300 mt-4 rounded-lg">
           <BlindCyclesPanel />
         </div>
-    </div>
+      </div>
+    </MainContent>
   );
 }
 
